@@ -65,7 +65,7 @@ fun TodayScreen(container: AppContainer, navigator: Navigator) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             while (true) {
                 delay(if (state.anyLive) 30_000 else 120_000)
-                vm.refresh(force = false, silent = true)
+                vm.refreshLive()
             }
         }
     }

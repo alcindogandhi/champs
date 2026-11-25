@@ -47,6 +47,12 @@ data class TeamSchedule(val results: List<Match>, val fixtures: List<Match>)
  */
 interface FootballDataSource {
     fun season(slug: String, force: Boolean = false): Flow<Loaded<Season>>
+
+    /**
+     * Temporada com os placares de hoje buscados agora na rede, para atualizar jogos ao vivo. Baixa só os
+     * jogos do dia (dezenas de KB) e aplica sobre a temporada em cache, em vez de baixar o mês inteiro.
+     */
+    fun seasonLive(slug: String): Flow<Loaded<Season>>
     fun standings(slug: String, force: Boolean = false): Flow<Loaded<List<StandingGroup>>>
     fun scorers(slug: String, force: Boolean = false): Flow<Loaded<List<Scorer>>>
     fun matchesOn(slug: String, date: LocalDate, force: Boolean = false): Flow<Loaded<List<Match>>>
@@ -98,14 +104,21 @@ class EspnDataSource(
         maxAge = { ONE_HOUR },
     )
 
-    override fun matchesOn(slug: String, date: LocalDate, force: Boolean): Flow<Loaded<List<Match>>> {
-        val today = LocalDate.now(zone())
-        // A ESPN agrupa os jogos por dia no horário de Nova York. Um dia no fuso do aparelho cobre dois dias
-        // de lá: o anterior, se o aparelho está a leste (Brasil, Europa), ou o seguinte, se está a oeste.
+    /**
+     * A ESPN agrupa os jogos por dia no horário de Nova York. Um dia no fuso do aparelho cobre dois dias
+     * de lá: o anterior, se o aparelho está a leste (Brasil, Europa), ou o seguinte, se está a oeste.
+     */
+    private fun espnDays(date: LocalDate): List<LocalDate> {
         val instant = date.atStartOfDay(zone()).toInstant()
         val eastOfEspn = zone().rules.getOffset(instant).totalSeconds >= ESPN_ZONE.rules.getOffset(instant).totalSeconds
-        val days = if (eastOfEspn) listOf(date.minusDays(1), date) else listOf(date, date.plusDays(1))
-        val urls = days.map { "$SITE/$slug/scoreboard?dates=${it.format(DAY)}&${localeQuery()}" }
+        return if (eastOfEspn) listOf(date.minusDays(1), date) else listOf(date, date.plusDays(1))
+    }
+
+    private fun dayUrl(slug: String, day: LocalDate) = "$SITE/$slug/scoreboard?dates=${day.format(DAY)}&${localeQuery()}"
+
+    override fun matchesOn(slug: String, date: LocalDate, force: Boolean): Flow<Loaded<List<Match>>> {
+        val today = LocalDate.now(zone())
+        val urls = espnDays(date).map { dayUrl(slug, it) }
         return multi(
             urls = urls,
             force = force,
@@ -118,7 +131,17 @@ class EspnDataSource(
         }
     }
 
-    override fun season(slug: String, force: Boolean): Flow<Loaded<Season>> = flow {
+    override fun season(slug: String, force: Boolean): Flow<Loaded<Season>> = seasonFlow(slug, force, emptyMap())
+
+    override fun seasonLive(slug: String): Flow<Loaded<Season>> = flow {
+        val fetched = espnDays(LocalDate.now(zone())).map { client.fetch(dayUrl(slug, it)) }
+        val today = fetched.flatMap { EspnMapper.matches(json.decodeFromString<ScoreboardDto>(it.text), slug) }
+            .associateBy { it.id }
+        seasonFlow(slug, force = false, overrides = today).collect { emit(it) }
+    }.flowOn(Dispatchers.Default)
+
+    /** [overrides]: jogos mais novos que os do cache dos meses (por id), vindos do placar do dia. */
+    private fun seasonFlow(slug: String, force: Boolean, overrides: Map<String, Match>): Flow<Loaded<Season>> = flow {
         // 1. Datas da temporada atual, informadas pelo scoreboard sem data.
         val currentUrl = "$SITE/$slug/scoreboard?${localeQuery()}"
         val cachedCurrent = client.cached(currentUrl)
@@ -131,12 +154,16 @@ class EspnDataSource(
         multi(urls, force, maxAge = { url ->
             val month = months[urls.indexOf(url)]
             when {
-                month == thisMonth || month == thisMonth.minusMonths(1) && LocalDate.now(zone()).dayOfMonth <= 2 -> ONE_MINUTE
+                // Com o placar do dia aplicado por cima, o mês inteiro não precisa ser baixado a cada minuto.
+                month == thisMonth || month == thisMonth.minusMonths(1) && LocalDate.now(zone()).dayOfMonth <= 2 ->
+                    if (overrides.isEmpty()) ONE_MINUTE else FIFTEEN_MINUTES
                 month < thisMonth -> ONE_WEEK
                 else -> ONE_HOUR
             }
         }) { bodies ->
-            val matches = bodies.flatMap { EspnMapper.matches(json.decodeFromString<ScoreboardDto>(it), slug) }.distinctBy { it.id }
+            val matches = bodies.flatMap { EspnMapper.matches(json.decodeFromString<ScoreboardDto>(it), slug) }
+                .distinctBy { it.id }
+                .map { overrides[it.id] ?: it }
             SeasonBuilder.build(matches)
         }.collect { emit(it) }
     }.flowOn(Dispatchers.Default)
@@ -235,6 +262,7 @@ class EspnDataSource(
         const val ONE_MINUTE = 60_000L
         const val FIVE_MINUTES = 5 * ONE_MINUTE
         const val TEN_MINUTES = 10 * ONE_MINUTE
+        const val FIFTEEN_MINUTES = 15 * ONE_MINUTE
         const val ONE_HOUR = 60 * ONE_MINUTE
         const val SIX_HOURS = 6 * ONE_HOUR
         const val ONE_DAY = 24 * ONE_HOUR

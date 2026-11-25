@@ -1,0 +1,1 @@
+Live scores now refresh at the right interval (20 s on the match screen, 30 s on Today's matches) and also on the competition Matches tab, downloading only the day's scores. Refreshing starts at kick-off time, without waiting for the live status.

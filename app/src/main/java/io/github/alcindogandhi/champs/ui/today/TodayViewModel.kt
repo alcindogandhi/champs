@@ -29,7 +29,8 @@ data class TodayUiState(
 ) {
     val loading get() = sections.isNotEmpty() && sections.all { it.state.data == null && it.state.loading }
     val refreshing get() = sections.any { it.state.refreshing }
-    val anyLive get() = sections.any { s -> s.state.data.orEmpty().any { it.isLive } }
+    /** Há jogo ao vivo ou começando: atualiza com mais frequência. */
+    val anyLive get() = sections.any { s -> s.state.data.orEmpty().any { it.needsLiveRefresh() } }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -64,7 +65,10 @@ class TodayViewModel(private val container: AppContainer) : ViewModel() {
         .let { sections -> combine(sections, date, liveOnly) { s, d, l -> TodayUiState(d, l, s) } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUiState())
 
-    fun refresh(force: Boolean = true, silent: Boolean = false) = loaders.forEach { it.second.load(force, silent) }
+    fun refresh() = loaders.forEach { it.second.load(force = true) }
+
+    /** Atualização automática, sem indicador. */
+    fun refreshLive() = loaders.forEach { it.second.refreshLive() }
 
     fun shiftDay(days: Long) = date.update { it.plusDays(days) }
 

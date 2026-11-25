@@ -12,5 +12,9 @@ class MatchViewModel(container: AppContainer, val slug: String, eventId: String)
         detail.load()
     }
 
-    fun refresh(silent: Boolean = false) = detail.load(force = !silent, silent = silent)
+    /** Atualização pedida pelo usuário: busca na rede e mostra o indicador. */
+    fun refresh() = detail.load(force = true)
+
+    /** Atualização automática durante o jogo, sem indicador. */
+    fun refreshLive() = detail.refreshLive()
 }

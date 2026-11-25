@@ -22,7 +22,9 @@ data class Selection(val phase: Int, val round: Int)
 class CompetitionViewModel(private val container: AppContainer, val slug: String) : ViewModel() {
 
     val standings = Loader(viewModelScope) { force -> container.football.standings(slug, force) }
-    val season = Loader(viewModelScope) { force -> container.football.season(slug, force) }
+    val season = Loader(viewModelScope, liveSource = { container.football.seasonLive(slug) }) { force ->
+        container.football.season(slug, force)
+    }
     val scorers = Loader(viewModelScope) { force -> container.football.scorers(slug, force) }
 
     val settings: StateFlow<Settings> = container.settings.settings
@@ -50,6 +52,9 @@ class CompetitionViewModel(private val container: AppContainer, val slug: String
         1 -> season.load(force = true)
         else -> scorers.load(force = true)
     }
+
+    /** Atualização automática dos placares de hoje, sem indicador. */
+    fun refreshLive() = season.refreshLive()
 
     fun selectPhase(phase: Int) {
         val data = season.state.value.data ?: return

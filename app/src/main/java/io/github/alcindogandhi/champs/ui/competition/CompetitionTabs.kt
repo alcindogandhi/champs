@@ -35,10 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.alcindogandhi.champs.R
 import io.github.alcindogandhi.champs.data.settings.TableColumn
 import io.github.alcindogandhi.champs.domain.KnockoutTie
+import io.github.alcindogandhi.champs.domain.Match
 import io.github.alcindogandhi.champs.domain.PhaseKind
 import io.github.alcindogandhi.champs.domain.Round
 import io.github.alcindogandhi.champs.domain.Season
@@ -50,6 +54,7 @@ import io.github.alcindogandhi.champs.ui.common.MatchRow
 import io.github.alcindogandhi.champs.ui.common.PhaseNames
 import io.github.alcindogandhi.champs.ui.common.TeamCrest
 import io.github.alcindogandhi.champs.ui.common.standingsTable
+import kotlinx.coroutines.delay
 
 @Composable
 fun StandingsTab(vm: CompetitionViewModel, columns: Set<TableColumn>, favoriteTeamId: String?, navigator: Navigator) {
@@ -75,6 +80,22 @@ fun StandingsTab(vm: CompetitionViewModel, columns: Set<TableColumn>, favoriteTe
 fun MatchesTab(vm: CompetitionViewModel, navigator: Navigator) {
     val state by vm.season.state.collectAsStateWithLifecycle()
     val selection by vm.selection.collectAsStateWithLifecycle()
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+
+    // Atualiza os placares sozinho enquanto a rodada ou fase aberta tem jogo ao vivo ou começando.
+    val liveInView = state.data?.let { season -> selection?.let { visibleMatches(season, it) } }
+        .orEmpty()
+        .any { it.needsLiveRefresh() }
+    LaunchedEffect(liveInView) {
+        if (!liveInView) return@LaunchedEffect
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            while (true) {
+                delay(LIVE_REFRESH_MILLIS)
+                vm.refreshLive()
+            }
+        }
+    }
+
     DataContent(
         state = state,
         onRefresh = { vm.refresh(1) },
@@ -89,6 +110,19 @@ fun MatchesTab(vm: CompetitionViewModel, navigator: Navigator) {
             onRound = vm::selectRound,
             onMatch = { navigator.match(vm.slug, it) },
         )
+    }
+}
+
+private const val LIVE_REFRESH_MILLIS = 30_000L
+
+/** Jogos que a aba Jogos mostra para a seleção: a rodada (liga) ou a fase inteira (mata-mata). */
+private fun visibleMatches(season: Season, selection: Selection): List<Match> {
+    val phase = season.phases.getOrNull(selection.phase.coerceIn(0, (season.phases.lastIndex).coerceAtLeast(0)))
+        ?: return emptyList()
+    return when (phase.kind) {
+        PhaseKind.LEAGUE -> phase.rounds.getOrNull(selection.round.coerceIn(0, (phase.rounds.lastIndex).coerceAtLeast(0)))
+            ?.matches.orEmpty()
+        PhaseKind.KNOCKOUT -> phase.matches
     }
 }
 

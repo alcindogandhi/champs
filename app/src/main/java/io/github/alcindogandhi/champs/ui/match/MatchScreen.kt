@@ -83,7 +83,7 @@ import kotlinx.coroutines.launch
 fun MatchScreen(container: AppContainer, slug: String, eventId: String, navigator: Navigator) {
     val vm = viewModel(key = "match-$slug-$eventId") { MatchViewModel(container, slug, eventId) }
     val state by vm.detail.state.collectAsStateWithLifecycle()
-    val live = state.data?.match?.isLive == true
+    val live = state.data?.match?.needsLiveRefresh() == true
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     LaunchedEffect(live) {
@@ -91,7 +91,7 @@ fun MatchScreen(container: AppContainer, slug: String, eventId: String, navigato
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             while (true) {
                 delay(20_000)
-                vm.refresh(silent = true)
+                vm.refreshLive()
             }
         }
     }

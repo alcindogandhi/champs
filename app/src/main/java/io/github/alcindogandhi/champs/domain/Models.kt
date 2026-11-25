@@ -1,5 +1,6 @@
 package io.github.alcindogandhi.champs.domain
 
+import java.time.Duration
 import java.time.Instant
 
 data class Team(
@@ -47,6 +48,21 @@ data class Match(
     val isLive get() = status.state == MatchState.LIVE
     val isFinished get() = status.state == MatchState.FINISHED
     val teamIds get() = setOf(home.team.id, away.team.id)
+
+    /**
+     * Jogo que pede atualização automática: ao vivo, ou agendado com início entre 3 h atrás e daqui a
+     * 2 min (o apito inicial pode ainda não ter chegado ao dado em cache).
+     */
+    fun needsLiveRefresh(now: Instant = Instant.now()): Boolean = when (status.state) {
+        MatchState.LIVE -> true
+        MatchState.SCHEDULED -> date != null && date in now.minus(LIVE_WINDOW)..now.plus(KICKOFF_MARGIN)
+        else -> false
+    }
+
+    private companion object {
+        val LIVE_WINDOW: Duration = Duration.ofHours(3)
+        val KICKOFF_MARGIN: Duration = Duration.ofMinutes(2)
+    }
 }
 
 enum class PhaseKind { LEAGUE, KNOCKOUT }

@@ -21,21 +21,33 @@ data class DataState<T>(
     val fetchedAt: Long? = null,
 )
 
-/** Liga um fluxo do repositório a um [DataState], cancelando a carga anterior a cada nova. */
+/**
+ * Liga um fluxo do repositório a um [DataState], cancelando a carga anterior a cada nova.
+ * [liveSource] é a fonte da atualização automática de jogos ao vivo; sem ela, usa [source] forçando a rede.
+ */
 class Loader<T>(
     private val scope: CoroutineScope,
+    private val liveSource: (() -> Flow<Loaded<T>>)? = null,
     private val source: (force: Boolean) -> Flow<Loaded<T>>,
 ) {
     private val _state = MutableStateFlow(DataState<T>())
     val state: StateFlow<DataState<T>> = _state.asStateFlow()
     private var job: Job? = null
 
-    /** [force] ignora o cache; [silent] não mostra o indicador de atualização (atualização automática). */
-    fun load(force: Boolean = false, silent: Boolean = false) {
+    /** [force] ignora o cache; [silent] não mostra o indicador de atualização. */
+    fun load(force: Boolean = false, silent: Boolean = false) = start(source(force), showRefreshing = force && !silent)
+
+    /**
+     * Atualização automática (jogos ao vivo): sempre busca na rede, sem indicador. Não depende da validade
+     * do cache, que conta a partir da chegada da resposta e faria um tique sim, outro não, ser ignorado.
+     */
+    fun refreshLive() = start(liveSource?.invoke() ?: source(true), showRefreshing = false)
+
+    private fun start(flow: Flow<Loaded<T>>, showRefreshing: Boolean) {
         job?.cancel()
-        _state.update { it.copy(loading = it.data == null, refreshing = force && !silent, error = null) }
+        _state.update { it.copy(loading = it.data == null, refreshing = showRefreshing, error = null) }
         job = scope.launch {
-            source(force)
+            flow
                 .catch { e ->
                     if (e is CancellationException) throw e
                     _state.update { it.copy(loading = false, refreshing = false, error = e) }

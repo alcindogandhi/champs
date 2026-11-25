@@ -92,4 +92,23 @@ class SeasonBuilderTest {
         assertNull(tie.winnerId)
         assertNull(tie.firstGoals)
     }
+
+    @Test
+    fun `janela de atualizacao ao vivo`() {
+        val now = Instant.parse("2026-11-25T22:00:00Z")
+        fun match(state: MatchState, date: Instant?) = Match(
+            id = "1", competitionSlug = "x", date = date, status = MatchStatus(state),
+            home = MatchSide(Team("a", "A")), away = MatchSide(Team("b", "B")),
+        )
+        assertTrue(match(MatchState.LIVE, now.minusSeconds(4 * 3600)).needsLiveRefresh(now))
+        // Agendado que já devia ter começado, ou que começa em 1 min.
+        assertTrue(match(MatchState.SCHEDULED, now.minusSeconds(10 * 60)).needsLiveRefresh(now))
+        assertTrue(match(MatchState.SCHEDULED, now.plusSeconds(60)).needsLiveRefresh(now))
+        // Longe do horário, encerrado ou adiado: não.
+        assertFalse(match(MatchState.SCHEDULED, now.plusSeconds(3600)).needsLiveRefresh(now))
+        assertFalse(match(MatchState.SCHEDULED, now.minusSeconds(4 * 3600)).needsLiveRefresh(now))
+        assertFalse(match(MatchState.FINISHED, now).needsLiveRefresh(now))
+        assertFalse(match(MatchState.POSTPONED, now).needsLiveRefresh(now))
+        assertFalse(match(MatchState.SCHEDULED, null).needsLiveRefresh(now))
+    }
 }

@@ -1,0 +1,1 @@
+Placares ao vivo atualizados no intervalo certo (20 s no jogo, 30 s em Jogos de hoje) e também na aba Jogos do campeonato, baixando só os placares do dia. A atualização começa já no horário do jogo, sem esperar o status de ao vivo.
