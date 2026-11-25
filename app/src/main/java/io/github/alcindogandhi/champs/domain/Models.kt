@@ -44,8 +44,10 @@ data class Match(
     val venue: String = "",
     /** Agregado do confronto de ida e volta, quando a ESPN informa (mandante, visitante). */
     val aggregate: Pair<Int, Int>? = null,
-    /** Id do time que avançou no confronto, quando a ESPN informa. */
+    /** Id do time que avançou no confronto, quando a fonte informa. */
     val seriesWinnerId: String? = null,
+    /** Página do jogo na fonte (ge), para quem quiser lances e escalações lá. */
+    val url: String? = null,
     /** Gols do jogo em ordem cronológica, quando a resposta traz o resumo (scoreboard). */
     val goals: List<Goal> = emptyList(),
 ) {
@@ -95,6 +97,8 @@ data class KnockoutTie(
 data class Phase(
     val slug: String,
     val kind: PhaseKind,
+    /** Nome dado pela fonte (ge); sem ele, o nome vem do slug (ESPN). */
+    val name: String? = null,
     val rounds: List<Round> = emptyList(),
     val ties: List<KnockoutTie> = emptyList(),
 ) {

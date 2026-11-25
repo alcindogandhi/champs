@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 
 fun Region.label(): Int = when (this) {
     Region.BRAZIL -> R.string.region_brazil
+    Region.STATES -> R.string.region_states
     Region.SOUTH_AMERICA -> R.string.region_south_america
     Region.EUROPE -> R.string.region_europe
     Region.WORLD -> R.string.region_world

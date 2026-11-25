@@ -18,6 +18,10 @@
     <string name="error_generic">Could not load the data</string>
     <string name="showing_data_from">%1$s. Showing data from %2$s.</string>
     <string name="source_espn">Source: ESPN</string>
+    <string name="source_ge">Source: ge (globoesporte.com)</string>
+    <string name="ge_match_details_unavailable">Plays, lineups and statistics for this competition are not available in Champs.</string>
+    <string name="ge_open_match">Open the match on ge</string>
+    <string name="ge_no_scorers">Top scorers for this competition are not available in Champs.</string>
 
     <!-- Drawer -->
     <string name="matches_today">Today\'s matches</string>
@@ -188,6 +192,7 @@
 
     <!-- Regions -->
     <string name="region_brazil">Brazil</string>
+    <string name="region_states">Brazilian state championships</string>
     <string name="region_south_america">South America</string>
     <string name="region_europe">Europe</string>
     <string name="region_world">World</string>
@@ -200,7 +205,7 @@
     <string name="theme_dark">Dark</string>
     <string name="data">Data</string>
     <string name="data_source">Data source</string>
-    <string name="data_source_description">ESPN (public, unofficial API). Champs is not affiliated with ESPN.</string>
+    <string name="data_source_description">ESPN and, for competitions it does not cover, ge (globoesporte.com). Public, unofficial APIs; Champs is not affiliated with either.</string>
     <string name="clear_data">Delete all data</string>
     <string name="clear_data_description">Cache, simulations and preferences</string>
     <string name="are_you_sure_clear_data">Are you sure you want to delete all app data? Simulations and preferences will be lost.</string>

@@ -7,7 +7,7 @@ Documento de referência do comportamento e das decisões técnicas do app. Para
 App Android de estatísticas de futebol, com foco nos campeonatos brasileiros, que recria as funcionalidades do Kamps (descontinuado em 2019).
 
 - **Plataforma:** Android 10+ (`minSdk 29`), Kotlin, Jetpack Compose com Material 3.
-- **Dados:** API pública e não oficial da ESPN, sem chave e sem backend próprio (§4).
+- **Dados:** API pública e não oficial da ESPN e, para os campeonatos que ela não cobre, o ge (globoesporte). Sem chave e sem backend próprio (§4).
 - **Sem anúncios, sem conta, sem rastreamento.** Nenhuma biblioteca proprietária (Google Play Services, Firebase), então o app é compatível com o F-Droid. Permissões: internet e, para as notificações (F11), notificações, serviço em primeiro plano, alarmes exatos (opcional) e reinício do aparelho.
 - **Idiomas:** português do Brasil (padrão) e inglês.
 
@@ -24,25 +24,27 @@ App Android de estatísticas de futebol, com foco nos campeonatos brasileiros, q
 | F7 | Time e time do coração | Posição e campanha no campeonato, próximos jogos e resultados. O coração marca o time do coração, que aparece no topo do menu e em destaque nas tabelas. Pode também ser escolhido numa lista, com busca, dos times dos campeonatos seguidos. |
 | F8 | Simulador | Só para campeonatos de pontos corridos. O usuário cria simulações com nome, dá placares aos jogos ainda não encerrados (botões − e + para cada time) e vê a tabela recalculada, com a variação de posição em relação à tabela real. Jogos encerrados usam o placar real. Ações: limpar um placar, limpar todos, renomear, apagar e compartilhar a tabela como texto. |
 | F9 | Configurações | Tema (sistema, dia, noite), time do coração, campeonatos, fonte dos dados, apagar todos os dados (cache, simulações e preferências, com confirmação), versão, código-fonte, licença e política de privacidade. |
-| F10 | Offline | Toda resposta da ESPN fica em cache. As telas abrem com o último dado conhecido e atualizam em seguida. Sem rede, um aviso mostra de quando é o dado. "Puxar para atualizar" em todas as listas. |
+| F10 | Offline | Toda resposta da ESPN e do ge fica em cache. As telas abrem com o último dado conhecido e atualizam em seguida. Sem rede, um aviso mostra de quando é o dado. "Puxar para atualizar" em todas as listas. |
 | F11 | Notificações | Avisos de **início de jogo** e de **cada gol** (time, placar parcial, minuto e autor, com "contra" ou "pênalti" quando for o caso). Valem para os jogos marcados com o sino na tela do jogo e, se a opção estiver ligada, para os jogos do time do coração nos próximos 14 dias, incluídos sozinhos. Tocar no aviso abre o jogo. Os avisos de um jogo ficam agrupados. A permissão de notificações (Android 13+) é pedida ao acompanhar o primeiro jogo ou ao escolher o time do coração. Ver §5.7. |
 
 **Fora do escopo:** avisos de intervalo, fim de jogo e cartões, widgets, notícias e simulação de mata-mata.
 
 ## 3. Catálogo de campeonatos
 
-Definido em `catalog/CompetitionCatalog.kt`. Cada campeonato tem o slug da ESPN, o nome, a região, se pode ser simulado e as zonas da tabela.
+Definido em `catalog/CompetitionCatalog.kt`. Cada campeonato tem um id (o slug da ESPN, ou `ge.<nome>` para os do ge com o caminho da página no ge), o nome, a região, se pode ser simulado e as zonas da tabela.
 
 - **Brasil:** Série A e Série B (simuláveis), Copa do Brasil, Copa do Nordeste, Paulista, Carioca, Mineiro e Gaúcho.
 - **América do Sul:** Libertadores, Sul-Americana e Campeonato Argentino.
 - **Europa:** Champions League, Europa League e Conference League. Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Liga Portugal e Eredivisie (simuláveis).
 - **Mundo:** Copa do Mundo e MLS.
 
-Séries C e D e os demais estaduais não entram porque a ESPN não tem dados deles (conferido com `scripts/check_slugs.py`).
+O que a ESPN não cobre vem do ge (§4.1): Séries C e D, Brasileirão Feminino, Copa Verde, Copa São Paulo de Futebol Júnior, os estaduais dos outros 23 estados e do DF, divisões de acesso de SP, SC, GO, MG, PB e ES, Copa Paulista, Copa Rio, Copa Espírito Santo, Sul-Americano Sub-17 e Mundial Sub-17. A região **Estaduais** reúne todos os estaduais, venham da ESPN ou do ge. Ficaram de fora as páginas do ge com edição antiga (ex.: Carioca B1 2019), conferido com `scripts/check_ge.py`.
 
 **Zonas:** quando a ESPN informa a faixa de um time (`note` com cor e descrição, como nos grupos da Libertadores), o app usa essa informação. Senão, usa as zonas aproximadas do catálogo (G4/G6, Sul-Americana, acesso, rebaixamento), e a legenda avisa que o número de vagas pode mudar a cada temporada.
 
-## 4. Fonte de dados (ESPN)
+## 4. Fontes de dados
+
+### 4.0 ESPN
 
 Base `https://site.api.espn.com`. Todo pedido leva o idioma do app: `lang=pt&region=br` em português, `lang=en&region=us` nos demais.
 
@@ -77,6 +79,24 @@ A ESPN agrupa os jogos por dia no horário de Nova York. Para "Jogos de hoje", o
 | Agenda do time | 10 min |
 
 O cache fica em `files/espn/` (um arquivo por URL) e fica fora do backup do Android.
+
+### 4.1 ge (globoesporte)
+
+Usado só para os campeonatos que a ESPN não cobre (`data/GeDataSource.kt`, `data/remote/ge/`). O `RoutingDataSource` escolhe a fonte de cada campeonato. O ge tem dois formatos:
+
+| Formato | Como funciona |
+|---|---|
+| **v1** (maioria) | A página do campeonato (`ge.globo.com/<caminho>/`, lida a cada 12 h) informa o id da tabela (`tUUID`) e as fases. Os dados vêm da API JSON pública, a mesma do Kamps: `api.globoesporte.globo.com/tabela/{id}/fase/{fase}/classificacao/` (tabela, grupos ou chaves do mata-mata, conforme o tipo da fase) e `.../rodada/{n}/jogos/` (jogos de todos os grupos). Respostas de 1 a 4 KB. |
+| **v2** (Baiano, Cearense, Pernambucano, Piauiense, Brasiliense, Capixaba, Goiano 2ª, Copa Rio, Mundial Sub-17) | A página já traz os dados embutidos (`getStandingData` e `getMatchListData`), sem API pública. Cada atualização baixa a página (~120 KB), então nunca mais que a cada 2 min. A página traz a tabela de todas as fases, as chaves completas do mata-mata e só a **rodada atual** das fases de liga. |
+
+Diferenças em relação à ESPN:
+- As rodadas e os nomes das fases são os oficiais do ge (sem dedução), e as faixas da tabela vêm com nome e cor.
+- Horários do ge estão em Brasília. O v1 não tem status explícito do jogo: não começado → agendado; transmissão "ENCERRADA" ou mais de 2h30 desde o início → encerrado; senão, em andamento. No v2, `moment` (`PAST`/`FUTURE`) e `result` dão o status.
+- Ids de jogos e times ganham o prefixo `ge-`, para não colidir com os da ESPN.
+- Escudos em SVG (decodificados com `coil-svg`).
+- **Não há** artilharia, lances, escalações nem estatísticas por API. A aba Artilheiros avisa isso, e o detalhe do jogo mostra placar, data e estádio, com um botão para a página do jogo no ge.
+- A tabela mostra as fases de liga e de grupos, a mais recente primeiro, com o nome da fase quando há mais de uma.
+- Notificações funcionam: a consulta ao vivo pede só a fase atual e a rodada atual (v1, ~1–2 KB) ou a página (v2, no máximo a cada 2 min). Como o ge não traz os autores dos gols, o aviso de gol sai sem autor.
 
 ## 5. Regras de cálculo
 
@@ -135,11 +155,12 @@ O Champs não tem servidor (o Kamps usava Firebase), então é o próprio aparel
 
 ## 7. Privacidade
 
-O app não coleta nem envia dados pessoais (ver [PRIVACY.md](PRIVACY.md)). Os únicos pedidos de rede vão para a ESPN (dados de futebol e escudos), com um User-Agent genérico do app.
+O app não coleta nem envia dados pessoais (ver [PRIVACY.md](PRIVACY.md)). Os únicos pedidos de rede vão para a ESPN e para o ge (dados de futebol e escudos), com um User-Agent genérico do app.
 
 ## 8. Limitações conhecidas
 
-- A API da ESPN não é oficial: pode mudar ou deixar de responder sem aviso.
+- As APIs da ESPN e do ge não são oficiais: podem mudar ou deixar de responder sem aviso. No ge, o formato v2 depende de dados embutidos na página, o que é mais frágil.
+- Campeonatos do ge não têm artilharia nem detalhes do jogo; no formato v2, só a rodada atual das fases de liga.
 - Alguns textos da ESPN chegam misturados com inglês mesmo em português (ex.: "PAL win 5-4 nos pênaltis").
 - As zonas do catálogo são aproximadas (§3).
 - O número da rodada é deduzido (§5.2). Se a ESPN mudar a forma de criar os ids, as rodadas podem sair erradas, e os testes com fixtures reais devem acusar.

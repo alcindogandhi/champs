@@ -18,6 +18,10 @@
     <string name="error_generic">Não foi possível carregar os dados</string>
     <string name="showing_data_from">%1$s. Mostrando dados de %2$s.</string>
     <string name="source_espn">Fonte: ESPN</string>
+    <string name="source_ge">Fonte: ge (globoesporte.com)</string>
+    <string name="ge_match_details_unavailable">Lances, escalações e estatísticas deste campeonato não estão disponíveis no Champs.</string>
+    <string name="ge_open_match">Ver o jogo no ge</string>
+    <string name="ge_no_scorers">A artilharia deste campeonato não está disponível no Champs.</string>
 
     <!-- Menu lateral -->
     <string name="matches_today">Jogos de hoje</string>
@@ -189,6 +193,7 @@
 
     <!-- Regiões -->
     <string name="region_brazil">Brasil</string>
+    <string name="region_states">Estaduais</string>
     <string name="region_south_america">América do Sul</string>
     <string name="region_europe">Europa</string>
     <string name="region_world">Mundo</string>
@@ -201,7 +206,7 @@
     <string name="theme_dark">Noite</string>
     <string name="data">Dados</string>
     <string name="data_source">Fonte dos dados</string>
-    <string name="data_source_description">ESPN (API pública, não oficial). O Champs não tem vínculo com a ESPN.</string>
+    <string name="data_source_description">ESPN e, para os campeonatos que ela não cobre, ge (globoesporte.com). APIs públicas, não oficiais; o Champs não tem vínculo com nenhum dos dois.</string>
     <string name="clear_data">Apagar todos os dados</string>
     <string name="clear_data_description">Cache, simulações e preferências</string>
     <string name="are_you_sure_clear_data">Você tem certeza que deseja apagar todos os dados do aplicativo? Simulações e preferências serão perdidas.</string>

@@ -12,6 +12,10 @@ import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
+import coil3.svg.SvgDecoder
+import io.github.alcindogandhi.champs.catalog.CompetitionCatalog
+import io.github.alcindogandhi.champs.data.GeDataSource
+import io.github.alcindogandhi.champs.data.RoutingDataSource
 import io.github.alcindogandhi.champs.data.EspnDataSource
 import io.github.alcindogandhi.champs.data.FootballDataSource
 import io.github.alcindogandhi.champs.data.db.ChampsDatabase
@@ -55,7 +59,11 @@ class ChampsApp : Application(), SingletonImageLoader.Factory {
 
     override fun newImageLoader(context: PlatformContext): ImageLoader =
         ImageLoader.Builder(context)
-            .components { add(OkHttpNetworkFetcherFactory(callFactory = { container.http })) }
+            .components {
+                add(OkHttpNetworkFetcherFactory(callFactory = { container.http }))
+                // Escudos do ge só existem em SVG.
+                add(SvgDecoder.Factory())
+            }
             .diskCache {
                 DiskCache.Builder()
                     .directory(context.cacheDir.resolve("crests"))
@@ -81,9 +89,11 @@ class AppContainer(context: Context) {
         }
         .build()
 
-    private val espnCacheDir = File(context.filesDir, "espn")
-
-    val football: FootballDataSource = EspnDataSource(EspnClient(http, espnCacheDir))
+    /** ESPN para a maioria dos campeonatos; ge para os que a ESPN não cobre (ver CompetitionCatalog). */
+    val football: FootballDataSource = RoutingDataSource(
+        espn = EspnDataSource(EspnClient(http, File(context.filesDir, "espn"))),
+        ge = GeDataSource(EspnClient(http, File(context.filesDir, "ge")), pagePath = { CompetitionCatalog.find(it)?.gePath }),
+    )
 
     val settings = SettingsRepository(
         PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("settings") },

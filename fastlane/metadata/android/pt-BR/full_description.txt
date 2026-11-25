@@ -1,7 +1,8 @@
 Acompanhe os campeonatos de futebol, principalmente os do Brasil, num app simples, rápido e sem propaganda.
 
 CAMPEONATOS
-• Brasileirão Séries A e B, Copa do Brasil, Copa do Nordeste e os estaduais Paulista, Carioca, Mineiro e Gaúcho.
+• Brasileirão Séries A, B, C e D, Brasileirão Feminino, Copa do Brasil, Copa do Nordeste, Copa Verde e Copinha.
+• Os estaduais de todos os estados e do DF, além de divisões de acesso e copas estaduais.
 • Libertadores, Sul-Americana e Campeonato Argentino.
 • Champions League, Europa League, Conference League, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Liga Portugal e Eredivisie.
 • Copa do Mundo e MLS.
@@ -38,4 +39,4 @@ PRIVACIDADE
 CÓDIGO ABERTO
 Software livre sob a licença GPL-3.0. Código, sugestões e relatos de problemas em github.com/alcindogandhi/champs
 
-Dados: API pública da ESPN. O Champs não tem vínculo com a ESPN. Requer Android 10 ou mais recente.
+Dados: ESPN e ge (globoesporte.com). O Champs não tem vínculo com nenhum dos dois. Requer Android 10 ou mais recente.

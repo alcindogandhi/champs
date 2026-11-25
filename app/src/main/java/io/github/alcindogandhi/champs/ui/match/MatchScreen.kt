@@ -31,9 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import io.github.alcindogandhi.champs.ui.common.exactAlarmSettingsIntent
 import io.github.alcindogandhi.champs.ui.common.rememberNotificationPermissionRequest
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.SportsSoccer
 import androidx.compose.material.icons.outlined.SwapVert
@@ -43,6 +46,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -167,7 +171,7 @@ fun MatchScreen(container: AppContainer, slug: String, eventId: String, navigato
         ) { detail ->
             Column(Modifier.fillMaxSize()) {
                 MatchHeader(detail.match) { team -> navigator.team(slug, team.id, team.name, team.logo) }
-                MatchTabs(detail)
+                if (CompetitionCatalog.find(slug)?.fromGe == true) GeMatchPanel(detail.match) else MatchTabs(detail)
             }
         }
     }
@@ -183,6 +187,36 @@ fun MatchScreen(container: AppContainer, slug: String, eventId: String, navigato
                 scope.launch { snackbar.showSnackbar(followedMessage) }
             },
         )
+    }
+}
+
+/** Jogo de campeonato do ge: sem lances, escalações e estatísticas por API; oferece a página do jogo. */
+@Composable
+private fun GeMatchPanel(match: Match) {
+    val uri = LocalUriHandler.current
+    Column(
+        Modifier.fillMaxSize().padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.height(24.dp))
+        Icon(Icons.Outlined.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(40.dp))
+        Spacer(Modifier.height(12.dp))
+        Text(
+            stringResource(R.string.ge_match_details_unavailable),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        match.url?.let { url ->
+            Spacer(Modifier.height(16.dp))
+            OutlinedButton(onClick = { runCatching { uri.openUri(url) } }) {
+                Icon(Icons.AutoMirrored.Outlined.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.ge_open_match))
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(stringResource(R.string.source_ge), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

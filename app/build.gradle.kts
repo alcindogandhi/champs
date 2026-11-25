@@ -23,8 +23,8 @@ android {
         applicationId = "io.github.alcindogandhi.champs"
         minSdk = 29
         targetSdk = 37
-        versionCode = 3
-        versionName = "0.0.3"
+        versionCode = 4
+        versionName = "0.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.svg)
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.alcindogandhi.champs.R
+import io.github.alcindogandhi.champs.catalog.CompetitionCatalog
 import io.github.alcindogandhi.champs.data.settings.TableColumn
 import io.github.alcindogandhi.champs.domain.KnockoutTie
 import io.github.alcindogandhi.champs.domain.Match
@@ -149,7 +150,7 @@ private fun SeasonMatches(
                     FilterChip(
                         selected = index == phaseIndex,
                         onClick = { onPhase(index) },
-                        label = { Text(PhaseNames.name(resources, p.slug)) },
+                        label = { Text(p.name ?: PhaseNames.name(resources, p.slug)) },
                     )
                 }
             }
@@ -265,7 +266,7 @@ fun ScorersTab(vm: CompetitionViewModel) {
     DataContent(
         state = state,
         onRefresh = { vm.refresh(2) },
-        emptyText = stringResource(R.string.no_scorers),
+        emptyText = stringResource(if (CompetitionCatalog.find(vm.slug)?.fromGe == true) R.string.ge_no_scorers else R.string.no_scorers),
         isEmpty = { it.isEmpty() },
     ) { scorers ->
         LazyColumn(Modifier.fillMaxSize()) {
@@ -314,7 +315,7 @@ fun ScorersTab(vm: CompetitionViewModel) {
             }
             item {
                 Text(
-                    stringResource(R.string.source_espn),
+                    stringResource(if (CompetitionCatalog.find(vm.slug)?.fromGe == true) R.string.source_ge else R.string.source_espn),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp),

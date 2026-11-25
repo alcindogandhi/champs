@@ -6,11 +6,11 @@ O Champs (`io.github.alcindogandhi.champs`) é um app de código aberto, mantido
 
 ## Acesso à internet
 
-O app usa a internet só para buscar dados públicos de futebol (tabelas, jogos, escalações, escudos) na API pública da ESPN. Esses pedidos levam apenas o campeonato, o jogo ou o time consultado, o idioma do app e um identificador genérico do app (User-Agent). Nenhum dado seu é enviado. Como em qualquer acesso à internet, a ESPN recebe o endereço IP da conexão. O Champs não tem vínculo com a ESPN.
+O app usa a internet só para buscar dados públicos de futebol (tabelas, jogos, escalações, escudos) na API pública da ESPN e, para os campeonatos que ela não cobre, no ge (globoesporte.com). Esses pedidos levam apenas o campeonato, o jogo ou o time consultado, o idioma do app e um identificador genérico do app (User-Agent). Nenhum dado seu é enviado. Como em qualquer acesso à internet, a ESPN e o ge recebem o endereço IP da conexão. O Champs não tem vínculo com a ESPN nem com o ge.
 
 ## Notificações
 
-Os avisos de início e gols são gerados no próprio aparelho: o app consulta a ESPN durante os jogos que você acompanha. Nenhum serviço de notificações de terceiros (como o Firebase) é usado, e nenhum identificador do aparelho é enviado. Durante esses jogos, uma notificação fixa mostra que o app está acompanhando. A permissão "Alarmes e lembretes" serve só para o app acordar na hora do jogo.
+Os avisos de início e gols são gerados no próprio aparelho: o app consulta a ESPN (ou o ge) durante os jogos que você acompanha. Nenhum serviço de notificações de terceiros (como o Firebase) é usado, e nenhum identificador do aparelho é enviado. Durante esses jogos, uma notificação fixa mostra que o app está acompanhando. A permissão "Alarmes e lembretes" serve só para o app acordar na hora do jogo.
 
 ## Dados guardados no aparelho
 
@@ -19,7 +19,7 @@ Tudo abaixo fica armazenado apenas no seu aparelho:
 - **Preferências:** campeonatos seguidos, time do coração, tema e colunas da tabela.
 - **Simulações:** os nomes das simulações e os placares que você escolheu.
 - **Jogos acompanhados:** os jogos com aviso ligado e o último placar visto de cada um.
-- **Cache:** cópias das últimas respostas da ESPN e dos escudos, para o app abrir rápido e funcionar sem internet.
+- **Cache:** cópias das últimas respostas da ESPN e do ge e dos escudos, para o app abrir rápido e funcionar sem internet.
 
 ## Backup do Android
 
@@ -47,11 +47,11 @@ Champs (`io.github.alcindogandhi.champs`) is an open-source app, maintained by A
 
 ## Internet access
 
-The app uses the internet only to fetch public football data (standings, matches, lineups, crests) from ESPN's public API. These requests carry only the competition, match or team being looked up, the app language and a generic app identifier (User-Agent). None of your data is sent. As with any internet access, ESPN receives the IP address of the connection. Champs is not affiliated with ESPN.
+The app uses the internet only to fetch public football data (standings, matches, lineups, crests) from ESPN's public API and, for competitions ESPN does not cover, from ge (globoesporte.com). These requests carry only the competition, match or team being looked up, the app language and a generic app identifier (User-Agent). None of your data is sent. As with any internet access, ESPN and ge receive the IP address of the connection. Champs is not affiliated with ESPN or ge.
 
 ## Notifications
 
-Kick-off and goal alerts are generated on the device itself: the app checks ESPN during the matches you follow. No third-party notification service (such as Firebase) is used, and no device identifier is sent. During those matches, an ongoing notification shows that the app is following them. The "Alarms & reminders" permission is used only to wake the app up at kick-off.
+Kick-off and goal alerts are generated on the device itself: the app checks ESPN (or ge) during the matches you follow. No third-party notification service (such as Firebase) is used, and no device identifier is sent. During those matches, an ongoing notification shows that the app is following them. The "Alarms & reminders" permission is used only to wake the app up at kick-off.
 
 ## Data stored on the device
 
@@ -60,7 +60,7 @@ Everything below is stored only on your device:
 - **Preferences:** followed competitions, favorite team, theme and table columns.
 - **Simulations:** simulation names and the scores you chose.
 - **Followed matches:** the matches with alerts on and the last score seen for each.
-- **Cache:** copies of the latest ESPN responses and crests, so the app opens quickly and works offline.
+- **Cache:** copies of the latest ESPN and ge responses and crests, so the app opens quickly and works offline.
 
 ## Android backup
 

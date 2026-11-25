@@ -8,7 +8,7 @@ A especificação completa está em [SPEC.md](SPEC.md).
 
 ## Dados
 
-Os dados vêm da API pública e não oficial da ESPN (`site.api.espn.com`), sem chave e sem backend próprio. O Champs não tem vínculo com a ESPN. Todo o acesso passa pela interface `FootballDataSource` (`data/FootballRepository.kt`), então outra fonte pode substituir a ESPN sem mexer nas telas.
+Os dados vêm da API pública e não oficial da ESPN (`site.api.espn.com`) e, para os campeonatos que ela não cobre (Séries C e D, a maioria dos estaduais, copas regionais), do ge (`api.globoesporte.globo.com` e páginas do `ge.globo.com`). Sem chave e sem backend próprio. O Champs não tem vínculo com a ESPN nem com o ge. Todo o acesso passa pela interface `FootballDataSource` (`data/FootballRepository.kt`); o `RoutingDataSource` escolhe a fonte de cada campeonato.
 
 ## Idiomas
 
@@ -44,7 +44,7 @@ Os builds de release só saem assinados se existir um `keystore.properties` na r
 ./gradlew lintDebug
 ```
 
-Os testes unitários usam respostas reais da ESPN gravadas em `app/src/test/resources/espn/`.
+Os testes unitários usam respostas reais da ESPN e do ge gravadas em `app/src/test/resources/espn/` e `app/src/test/resources/ge/`.
 
 Para testar as notificações sem esperar um jogo ao vivo, o build de debug aceita um comando que "rebobina" um jogo real já encerrado: o app passa a acompanhá-lo como se estivesse ao vivo com o placar informado e, na consulta seguinte, avisa os gols que faltam.
 
@@ -58,6 +58,7 @@ adb shell am broadcast -a io.github.alcindogandhi.champs.debug.REWIND -p io.gith
 | Script | Para que serve |
 |---|---|
 | `scripts/check_slugs.py` | Confere se os campeonatos do catálogo respondem na ESPN e lista as fases do ano: `python3 -I scripts/check_slugs.py 2026 bra.1 bra.2` |
+| `scripts/check_ge.py` | Classifica páginas de campeonatos do ge (formato v1, v2 ou sem tabela) e mostra a edição atual: `python3 -I scripts/check_ge.py urls.txt` |
 | `scripts/season_fixture.py` | Grava a temporada inteira de um campeonato como fixture de teste: `python3 -I scripts/season_fixture.py bra.1 2026 saida.json` |
 | `scripts/store_screenshots.sh` | Gera as capturas da loja em `fastlane/` com um emulador ligado |
 | `scripts/art/` | Fontes SVG do ícone e do feature graphic da loja |
@@ -66,9 +67,9 @@ adb shell am broadcast -a io.github.alcindogandhi.champs.debug.REWIND -p io.gith
 
 ```
 app/src/main/java/io/github/alcindogandhi/champs/
-  catalog/          campeonatos oferecidos (slug da ESPN, nome, região, zonas da tabela)
-  data/remote/      cliente HTTP com cache em arquivo, DTOs e conversão da ESPN
-  data/             FootballDataSource / EspnDataSource
+  catalog/          campeonatos oferecidos (fonte, nome, região, zonas da tabela)
+  data/remote/      cliente HTTP com cache em arquivo, DTOs e conversão da ESPN (e do ge, em ge/)
+  data/             FootballDataSource, EspnDataSource, GeDataSource e RoutingDataSource
   data/db/          Room: simulações e jogos acompanhados
   data/settings/    DataStore: tema, campeonatos seguidos, time do coração, colunas
   domain/           modelos, SeasonBuilder (rodadas e chaves), StandingsCalculator, LineupLayout, MatchEvents

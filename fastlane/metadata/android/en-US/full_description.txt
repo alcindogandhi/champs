@@ -1,7 +1,8 @@
 Follow football (soccer) competitions, especially Brazilian ones, in a simple, fast, ad-free app.
 
 COMPETITIONS
-• Brazilian Série A and B, Copa do Brasil, Copa do Nordeste and the Paulista, Carioca, Mineiro and Gaúcho state championships.
+• Brazilian Série A, B, C and D, Women's Brasileirão, Copa do Brasil, Copa do Nordeste, Copa Verde and Copinha.
+• The state championships of every Brazilian state and the Federal District, plus lower divisions and state cups.
 • Copa Libertadores, Copa Sudamericana and the Argentine league.
 • Champions League, Europa League, Conference League, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Liga Portugal and Eredivisie.
 • FIFA World Cup and MLS.
@@ -38,4 +39,4 @@ PRIVACY
 OPEN SOURCE
 Free software under the GPL-3.0 license. Code, suggestions and bug reports at github.com/alcindogandhi/champs
 
-Data: ESPN public API. Champs is not affiliated with ESPN. Requires Android 10 or newer.
+Data: ESPN and ge (globoesporte.com). Champs is not affiliated with either. Requires Android 10 or newer.
