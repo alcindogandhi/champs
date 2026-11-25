@@ -14,6 +14,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -49,7 +50,12 @@ class EspnDataSourceTest {
                 .body(body.toResponseBody("application/json".toMediaType()))
                 .build()
         }.build()
-        return EspnDataSource(EspnClient(http, folder.newFolder("espn")), zone = { ZoneId.of("America/Sao_Paulo") })
+        return EspnDataSource(
+            EspnClient(http, folder.newFolder("espn")),
+            zone = { ZoneId.of("America/Sao_Paulo") },
+            // 25/11, 19:00 em São Paulo (17:00 em Nova York): um único dia da ESPN cobre os jogos ao vivo.
+            now = { Instant.parse("2026-11-25T22:00:00Z") },
+        )
     }
 
     @Test
@@ -62,11 +68,25 @@ class EspnDataSourceTest {
         val live = source.seasonLive("bra.1").last().data
 
         assertEquals(5, live.matches.first { it.id == "401841318" }.home.score)
-        // Dois dias da ESPN cobrem o dia no fuso de São Paulo; nenhum mês é baixado de novo.
-        assertEquals(2, requests.size)
+        // Só o placar de hoje da ESPN; nenhum mês é baixado de novo.
+        assertEquals(1, requests.size)
+        assertTrue(requests.single().contains("dates=20261125&"))
         assertTrue(requests.all { (Regex("dates=(\\d+)").find(it)?.groupValues?.get(1)?.length ?: 0) == 8 })
         // As rodadas continuam as mesmas.
         assertEquals(before.phases.single().rounds.size, live.phases.single().rounds.size)
+    }
+
+    @Test
+    fun `vigia de jogos baixa um unico dia da ESPN, no horario de Nova York`() = runTest {
+        val source = dataSource()
+        // 03/12 às 00:30 UTC é 02/12 às 19:30 em Nova York: a ESPN lista o jogo no dia 02.
+        val kickoff = Instant.parse("2026-12-03T00:30:00Z")
+        source.matchesOfEspnDay("bra.1", kickoff, force = true).last()
+        assertEquals(1, requests.size)
+        assertTrue(requests.single().contains("dates=20261202&"))
+        requests.clear()
+        source.matchesOfEspnDay("bra.1", kickoff, dayOffset = 1, force = true).last()
+        assertTrue(requests.single().contains("dates=20261203&"))
     }
 
     @Test

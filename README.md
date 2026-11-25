@@ -1,6 +1,6 @@
 # Champs
 
-App Android de estatísticas de futebol, com foco nos campeonatos brasileiros: tabela, jogos por rodada, mata-mata, artilheiros, jogos do dia, lance a lance, escalações, comparação de estatísticas, time do coração e um simulador de pontos corridos. É software livre e não tem anúncios.
+App Android de estatísticas de futebol, com foco nos campeonatos brasileiros: tabela, jogos por rodada, mata-mata, artilheiros, jogos do dia, lance a lance, escalações, comparação de estatísticas, time do coração, avisos de início e gols e um simulador de pontos corridos. É software livre e não tem anúncios.
 
 O Champs é inspirado no Kamps, app descontinuado em 2019. Ele recria as funcionalidades, mas não usa nome, marca, imagens nem código do original.
 
@@ -46,6 +46,13 @@ Os builds de release só saem assinados se existir um `keystore.properties` na r
 
 Os testes unitários usam respostas reais da ESPN gravadas em `app/src/test/resources/espn/`.
 
+Para testar as notificações sem esperar um jogo ao vivo, o build de debug aceita um comando que "rebobina" um jogo real já encerrado: o app passa a acompanhá-lo como se estivesse ao vivo com o placar informado e, na consulta seguinte, avisa os gols que faltam.
+
+```sh
+adb shell am broadcast -a io.github.alcindogandhi.champs.debug.REWIND -p io.github.alcindogandhi.champs \
+  --es slug bra.1 --es event 401841335 --es date 2026-11-24 --ei home 0 --ei away 0
+```
+
 ## Scripts
 
 | Script | Para que serve |
@@ -62,9 +69,10 @@ app/src/main/java/io/github/alcindogandhi/champs/
   catalog/          campeonatos oferecidos (slug da ESPN, nome, região, zonas da tabela)
   data/remote/      cliente HTTP com cache em arquivo, DTOs e conversão da ESPN
   data/             FootballDataSource / EspnDataSource
-  data/db/          Room: simulações
+  data/db/          Room: simulações e jogos acompanhados
   data/settings/    DataStore: tema, campeonatos seguidos, time do coração, colunas
-  domain/           modelos, SeasonBuilder (rodadas e chaves), StandingsCalculator, LineupLayout
+  domain/           modelos, SeasonBuilder (rodadas e chaves), StandingsCalculator, LineupLayout, MatchEvents
+  notifications/    avisos de início e gols: MatchWatcher, LiveMatchService, alarmes e WorkManager
   ui/               telas em Jetpack Compose
 ```
 

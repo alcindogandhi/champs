@@ -2,6 +2,7 @@ package io.github.alcindogandhi.champs.data.remote
 
 import io.github.alcindogandhi.champs.catalog.Competition
 import io.github.alcindogandhi.champs.domain.EventKind
+import io.github.alcindogandhi.champs.domain.Goal
 import io.github.alcindogandhi.champs.domain.Lineup
 import io.github.alcindogandhi.champs.domain.LineupPlayer
 import io.github.alcindogandhi.champs.domain.Match
@@ -65,6 +66,7 @@ object EspnMapper {
             state = state,
             clock = if (state == MatchState.LIVE) dto?.displayClock.orEmpty() else "",
             detail = type?.shortDetail ?: type?.detail ?: type?.description.orEmpty(),
+            halftime = state == MatchState.LIVE && name.contains("HALFTIME"),
         )
     }
 
@@ -110,6 +112,16 @@ object EspnMapper {
             venue = comp.venue?.fullName ?: comp.venue?.displayName.orEmpty(),
             aggregate = aggregate,
             seriesWinnerId = seriesWinner,
+            goals = comp.details.filter { it.scoringPlay && !it.shootout }.mapNotNull { d ->
+                val teamId = d.team?.id ?: return@mapNotNull null
+                Goal(
+                    teamId = teamId,
+                    clock = d.clock?.displayValue.orEmpty(),
+                    scorer = d.athletesInvolved.firstOrNull()?.let { it.displayName ?: it.shortName },
+                    ownGoal = d.ownGoal,
+                    penalty = d.penaltyKick,
+                )
+            },
         )
     }
 

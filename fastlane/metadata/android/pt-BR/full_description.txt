@@ -22,6 +22,9 @@ JOGOS
 TIME DO CORAÇÃO
 Marque seu time para vê-lo em destaque nas tabelas e ter atalho para os próximos jogos e resultados.
 
+AVISOS DE GOL
+Toque no sino de um jogo para ser avisado do início e de cada gol, com placar, minuto e autor. Os jogos do seu time do coração entram sozinhos. Tudo funciona sem servidor nem Firebase: o próprio celular acompanha os jogos.
+
 SIMULADOR
 Dê os placares dos jogos que faltam e veja a classificação final mudar na hora, com quantas posições cada time ganhou ou perdeu. Salve várias simulações e compartilhe a sua.
 

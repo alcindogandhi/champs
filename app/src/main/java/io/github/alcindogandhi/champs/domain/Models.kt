@@ -19,6 +19,8 @@ data class MatchStatus(
     val clock: String = "",
     /** Texto curto da ESPN para o status ("Intervalo", "Finalizado", "Pênaltis"). */
     val detail: String = "",
+    /** Intervalo entre os tempos (o jogo segue [MatchState.LIVE]). */
+    val halftime: Boolean = false,
 )
 
 data class MatchSide(
@@ -44,6 +46,8 @@ data class Match(
     val aggregate: Pair<Int, Int>? = null,
     /** Id do time que avançou no confronto, quando a ESPN informa. */
     val seriesWinnerId: String? = null,
+    /** Gols do jogo em ordem cronológica, quando a resposta traz o resumo (scoreboard). */
+    val goals: List<Goal> = emptyList(),
 ) {
     val isLive get() = status.state == MatchState.LIVE
     val isFinished get() = status.state == MatchState.FINISHED
@@ -64,6 +68,15 @@ data class Match(
         val KICKOFF_MARGIN: Duration = Duration.ofMinutes(2)
     }
 }
+
+/** Gol do resumo do scoreboard. [teamId] é o time a quem o gol foi creditado no placar. */
+data class Goal(
+    val teamId: String,
+    val clock: String,
+    val scorer: String?,
+    val ownGoal: Boolean = false,
+    val penalty: Boolean = false,
+)
 
 enum class PhaseKind { LEAGUE, KNOCKOUT }
 

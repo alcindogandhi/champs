@@ -57,6 +57,20 @@ class CompetitionDto(
     val notes: List<NoteDto> = emptyList(),
     val series: SeriesDto? = null,
     val competitors: List<CompetitorDto> = emptyList(),
+    /** Gols e cartões resumidos, presentes no scoreboard. */
+    val details: List<DetailDto> = emptyList(),
+)
+
+@Serializable
+class DetailDto(
+    val type: TypeDto? = null,
+    val clock: ClockDto? = null,
+    val team: TeamRefDto? = null,
+    val scoringPlay: Boolean = false,
+    val ownGoal: Boolean = false,
+    val penaltyKick: Boolean = false,
+    val shootout: Boolean = false,
+    val athletesInvolved: List<AthleteDto> = emptyList(),
 )
 
 @Serializable

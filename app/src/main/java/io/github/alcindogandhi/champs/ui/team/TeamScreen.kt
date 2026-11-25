@@ -44,6 +44,7 @@ import io.github.alcindogandhi.champs.ui.common.DataContent
 import io.github.alcindogandhi.champs.ui.common.MatchRow
 import io.github.alcindogandhi.champs.ui.common.SectionHeader
 import io.github.alcindogandhi.champs.ui.common.TeamCrest
+import io.github.alcindogandhi.champs.ui.common.rememberNotificationPermissionRequest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +56,8 @@ fun TeamScreen(container: AppContainer, slug: String, teamId: String, name: Stri
     val standings by vm.standings.state.collectAsStateWithLifecycle()
     val settings by vm.settings.collectAsStateWithLifecycle()
     val isFavorite = settings.favorite?.team?.id == teamId
+    // Ao escolher o time do coração, pede a permissão para avisar os jogos dele.
+    val requestPermission = rememberNotificationPermissionRequest()
 
     Scaffold(
         topBar = {
@@ -66,7 +69,10 @@ fun TeamScreen(container: AppContainer, slug: String, teamId: String, name: Stri
                     }
                 },
                 actions = {
-                    IconButton(onClick = { vm.toggleFavorite() }) {
+                    IconButton(onClick = {
+                        vm.toggleFavorite()
+                        if (!isFavorite && settings.notifyFavorite) requestPermission()
+                    }) {
                         if (isFavorite) {
                             Icon(Icons.Filled.Favorite, stringResource(R.string.unchoose_current_team), tint = MaterialTheme.colorScheme.primary)
                         } else {

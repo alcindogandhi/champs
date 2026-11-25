@@ -1,0 +1,1 @@
+Kick-off and goal alerts (score, minute and scorer) for matches marked with the bell and for your favorite team, with no server or Firebase. Battery saver option. Lighter checks: one request at a time and no background work when nothing is followed.

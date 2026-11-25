@@ -1,5 +1,6 @@
 package io.github.alcindogandhi.champs.data.db
 
+import androidx.room.AutoMigration
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -74,7 +75,59 @@ interface SimulationDao {
     suspend fun clearScores(simulationId: Long)
 }
 
-@Database(entities = [SimulationEntity::class, SimulatedScoreEntity::class], version = 1)
+/**
+ * Jogo acompanhado para notificações, com o último estado visto (para detectar início e gols).
+ * [auto] marca os jogos do time do coração, incluídos automaticamente.
+ */
+@Entity(tableName = "followed_match")
+data class FollowedMatchEntity(
+    @PrimaryKey val eventId: String,
+    val competitionSlug: String,
+    val homeId: String,
+    val homeName: String,
+    val awayId: String,
+    val awayName: String,
+    /** Horário de início, em milissegundos desde a época; null se a ESPN não informou. */
+    val kickoff: Long?,
+    /** Nome de [io.github.alcindogandhi.champs.domain.MatchState]. */
+    val lastState: String,
+    val lastHome: Int?,
+    val lastAway: Int?,
+    val auto: Boolean,
+    val followedAt: Long,
+)
+
+@Dao
+interface FollowedMatchDao {
+    @Query("SELECT eventId FROM followed_match")
+    fun observeIds(): Flow<List<String>>
+
+    @Query("SELECT * FROM followed_match WHERE lastState NOT IN ('FINISHED', 'CANCELED') ORDER BY kickoff")
+    suspend fun pending(): List<FollowedMatchEntity>
+
+    @Query("SELECT * FROM followed_match WHERE eventId = :eventId")
+    suspend fun get(eventId: String): FollowedMatchEntity?
+
+    @Upsert
+    suspend fun upsert(match: FollowedMatchEntity)
+
+    @Query("DELETE FROM followed_match WHERE eventId = :eventId")
+    suspend fun delete(eventId: String)
+
+    @Query("DELETE FROM followed_match WHERE auto = 1 AND lastState = 'SCHEDULED'")
+    suspend fun deleteUpcomingAuto()
+
+    /** Limpa jogos encerrados há tempo (ou que nunca aconteceram). */
+    @Query("DELETE FROM followed_match WHERE kickoff IS NOT NULL AND kickoff < :before")
+    suspend fun deleteOlderThan(before: Long)
+}
+
+@Database(
+    entities = [SimulationEntity::class, SimulatedScoreEntity::class, FollowedMatchEntity::class],
+    version = 2,
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
+)
 abstract class ChampsDatabase : RoomDatabase() {
     abstract fun simulations(): SimulationDao
+    abstract fun followedMatches(): FollowedMatchDao
 }

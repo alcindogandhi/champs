@@ -212,4 +212,38 @@
     <string name="license_description">GNU GPL 3.0: free software, no ads</string>
     <string name="privacy">Privacy policy</string>
     <string name="privacy_description">No personal data is collected</string>
+
+    <!-- Notifications -->
+    <string name="notifications">Notifications</string>
+    <string name="channel_events_name">Goals and kick-offs</string>
+    <string name="channel_events_description">Alerts for the matches you follow</string>
+    <string name="channel_watching_name">Match tracking</string>
+    <string name="channel_watching_description">Ongoing notification while the app follows matches in progress</string>
+    <string name="notification_match_start">Kick-off!</string>
+    <string name="notification_goal">Goal for %1$s!</string>
+    <string name="notification_own_goal">own goal</string>
+    <string name="notification_penalty">penalty</string>
+    <plurals name="notification_watching">
+        <item quantity="one">Following %d match</item>
+        <item quantity="other">Following %d matches</item>
+    </plurals>
+    <string name="follow_match">Notify kick-off and goals</string>
+    <string name="unfollow_match">Stop following</string>
+    <string name="follow_match_done">You will be notified of this match\'s kick-off and goals</string>
+    <string name="notifications_blocked">Notifications are blocked. Allow them in the app settings.</string>
+    <string name="exact_alarm_dialog_title">Alerts on time</string>
+    <string name="exact_alarm_dialog_text">To start following the match at kick-off, even when the phone is idle, allow Alarms &amp; reminders for Champs. Without it, alerts may be delayed.</string>
+    <string name="allow">Allow</string>
+    <string name="not_now">Not now</string>
+    <string name="notify_favorite_team">Notify my team\'s matches</string>
+    <string name="notify_favorite_team_description">Kick-off and goals of %1$s matches</string>
+    <string name="notify_favorite_team_none">Choose a favorite team to get alerts for its matches</string>
+    <string name="battery_saver">Battery saver</string>
+    <string name="battery_saver_description">During followed matches, checks every 2 min instead of 30 s. Alerts may arrive up to 2 min later.</string>
+    <string name="notifications_permission">Notification permission</string>
+    <string name="allowed">Allowed</string>
+    <string name="notifications_blocked_tap">Blocked. Tap to allow.</string>
+    <string name="exact_alarms">Alarms &amp; reminders</string>
+    <string name="exact_alarms_allowed">Allowed: alerts on time</string>
+    <string name="exact_alarms_denied">Not allowed: alerts may be delayed while the phone is idle. Tap to allow.</string>
 </resources>

@@ -8,15 +8,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Alarm
+import androidx.compose.material.icons.outlined.BatterySaver
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Gavel
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Tune
@@ -30,6 +35,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -43,10 +49,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.alcindogandhi.champs.AppContainer
 import io.github.alcindogandhi.champs.BuildConfig
@@ -54,6 +62,9 @@ import io.github.alcindogandhi.champs.R
 import io.github.alcindogandhi.champs.data.settings.ThemeMode
 import io.github.alcindogandhi.champs.ui.Navigator
 import io.github.alcindogandhi.champs.ui.common.SectionHeader
+import io.github.alcindogandhi.champs.ui.common.exactAlarmSettingsIntent
+import io.github.alcindogandhi.champs.ui.common.notificationSettingsIntent
+import io.github.alcindogandhi.champs.ui.common.rememberNotificationPermissionRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,6 +89,20 @@ fun SettingsScreen(container: AppContainer, navigator: Navigator) {
     var choosingTheme by rememberSaveable { mutableStateOf(false) }
     var confirmingClear by rememberSaveable { mutableStateOf(false) }
     val clearedMessage = stringResource(R.string.clear_data_done)
+    val context = LocalContext.current
+    // Estados das permissões, relidos ao voltar das telas do sistema.
+    var notificationsAllowed by remember { mutableStateOf(container.notifier.canNotify()) }
+    var exactAlarms by remember { mutableStateOf(container.watcher.canScheduleExactAlarms()) }
+    LifecycleResumeEffect(Unit) {
+        notificationsAllowed = container.notifier.canNotify()
+        exactAlarms = container.watcher.canScheduleExactAlarms()
+        scope.launch { container.watcher.reschedule() }
+        onPauseOrDispose { }
+    }
+    val requestPermission = rememberNotificationPermissionRequest { granted ->
+        notificationsAllowed = container.notifier.canNotify()
+        if (!granted) runCatching { context.startActivity(notificationSettingsIntent(context)) }
+    }
     val current = settings ?: return
 
     Scaffold(
@@ -103,6 +128,48 @@ fun SettingsScreen(container: AppContainer, navigator: Navigator) {
                 onClick = navigator::favoriteTeam,
             )
             Item(Icons.Outlined.Tune, stringResource(R.string.manage_competitions), null, onClick = navigator::manageCompetitions)
+            HorizontalDivider()
+            SectionHeader(stringResource(R.string.notifications))
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.notify_favorite_team)) },
+                supportingContent = {
+                    Text(
+                        current.favorite?.let { stringResource(R.string.notify_favorite_team_description, it.team.name) }
+                            ?: stringResource(R.string.notify_favorite_team_none),
+                    )
+                },
+                leadingContent = { Icon(Icons.Outlined.NotificationsActive, contentDescription = null) },
+                trailingContent = { Switch(checked = current.notifyFavorite, onCheckedChange = null) },
+                modifier = Modifier.toggleable(value = current.notifyFavorite, role = Role.Switch) { enabled ->
+                    scope.launch { container.settings.setNotifyFavorite(enabled) }
+                    if (enabled) requestPermission()
+                },
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.battery_saver)) },
+                supportingContent = { Text(stringResource(R.string.battery_saver_description)) },
+                leadingContent = { Icon(Icons.Outlined.BatterySaver, contentDescription = null) },
+                trailingContent = { Switch(checked = current.batterySaver, onCheckedChange = null) },
+                modifier = Modifier.toggleable(value = current.batterySaver, role = Role.Switch) { enabled ->
+                    scope.launch { container.settings.setBatterySaver(enabled) }
+                },
+            )
+            Item(
+                Icons.Outlined.Notifications,
+                stringResource(R.string.notifications_permission),
+                stringResource(if (notificationsAllowed) R.string.allowed else R.string.notifications_blocked_tap),
+            ) {
+                if (notificationsAllowed) {
+                    runCatching { context.startActivity(notificationSettingsIntent(context)) }
+                } else {
+                    requestPermission()
+                }
+            }
+            Item(
+                Icons.Outlined.Alarm,
+                stringResource(R.string.exact_alarms),
+                stringResource(if (exactAlarms) R.string.exact_alarms_allowed else R.string.exact_alarms_denied),
+            ) { runCatching { context.startActivity(exactAlarmSettingsIntent(context)) } }
             HorizontalDivider()
             SectionHeader(stringResource(R.string.data))
             Item(Icons.Outlined.Public, stringResource(R.string.data_source), stringResource(R.string.data_source_description), onClick = null)
@@ -154,6 +221,7 @@ fun SettingsScreen(container: AppContainer, navigator: Navigator) {
                 TextButton(onClick = {
                     confirmingClear = false
                     scope.launch {
+                        container.watcher.clear()
                         withContext(Dispatchers.IO) {
                             container.football.clearCache()
                             container.database.clearAllTables()

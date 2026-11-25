@@ -1,0 +1,1 @@
+Avisos de início de jogo e de cada gol (placar, minuto e autor) nos jogos marcados com o sino e nos jogos do time do coração, sem servidor nem Firebase. Opção Economia de bateria. Consultas mais leves: um pedido por vez e nenhum trabalho em segundo plano sem jogos a acompanhar.

@@ -8,7 +8,7 @@ App Android de estatísticas de futebol, com foco nos campeonatos brasileiros, q
 
 - **Plataforma:** Android 10+ (`minSdk 29`), Kotlin, Jetpack Compose com Material 3.
 - **Dados:** API pública e não oficial da ESPN, sem chave e sem backend próprio (§4).
-- **Sem anúncios, sem conta, sem rastreamento.** Nenhuma biblioteca proprietária (Google Play Services, Firebase), então o app é compatível com o F-Droid. A única permissão é `INTERNET`.
+- **Sem anúncios, sem conta, sem rastreamento.** Nenhuma biblioteca proprietária (Google Play Services, Firebase), então o app é compatível com o F-Droid. Permissões: internet e, para as notificações (F11), notificações, serviço em primeiro plano, alarmes exatos (opcional) e reinício do aparelho.
 - **Idiomas:** português do Brasil (padrão) e inglês.
 
 ## 2. Funcionalidades
@@ -25,8 +25,9 @@ App Android de estatísticas de futebol, com foco nos campeonatos brasileiros, q
 | F8 | Simulador | Só para campeonatos de pontos corridos. O usuário cria simulações com nome, dá placares aos jogos ainda não encerrados (botões − e + para cada time) e vê a tabela recalculada, com a variação de posição em relação à tabela real. Jogos encerrados usam o placar real. Ações: limpar um placar, limpar todos, renomear, apagar e compartilhar a tabela como texto. |
 | F9 | Configurações | Tema (sistema, dia, noite), time do coração, campeonatos, fonte dos dados, apagar todos os dados (cache, simulações e preferências, com confirmação), versão, código-fonte, licença e política de privacidade. |
 | F10 | Offline | Toda resposta da ESPN fica em cache. As telas abrem com o último dado conhecido e atualizam em seguida. Sem rede, um aviso mostra de quando é o dado. "Puxar para atualizar" em todas as listas. |
+| F11 | Notificações | Avisos de **início de jogo** e de **cada gol** (time, placar parcial, minuto e autor, com "contra" ou "pênalti" quando for o caso). Valem para os jogos marcados com o sino na tela do jogo e, se a opção estiver ligada, para os jogos do time do coração nos próximos 14 dias, incluídos sozinhos. Tocar no aviso abre o jogo. Os avisos de um jogo ficam agrupados. A permissão de notificações (Android 13+) é pedida ao acompanhar o primeiro jogo ou ao escolher o time do coração. Ver §5.7. |
 
-**Fora do escopo da v1:** notificações (gols e início de jogos), widgets, notícias e simulação de mata-mata.
+**Fora do escopo:** avisos de intervalo, fim de jogo e cartões, widgets, notícias e simulação de mata-mata.
 
 ## 3. Catálogo de campeonatos
 
@@ -108,13 +109,28 @@ Os jogos da fase são agrupados pelo par de times. O agregado soma os gols dos j
 
 `domain/LineupLayout.kt`: a ESPN informa o esquema tático ("3-4-2-1") e a sigla da posição de cada titular (G, ZC, ZE, LD, VOL, MC, ME, A...). Os titulares são ordenados pela profundidade da posição (goleiro, defesa, volante, meio, pontas, centroavante) e pelo `formationPlace`, e depois fatiados conforme o esquema. Dentro da linha, a ordem é da esquerda para a direita pelo sufixo E/C/D. Sem esquema válido ou sem 11 titulares, só a lista é mostrada.
 
+### 5.7 Notificações sem servidor
+
+O Champs não tem servidor (o Kamps usava Firebase), então é o próprio aparelho que consulta a ESPN (`notifications/`):
+
+- **O que consultar:** os jogos acompanhados ficam na tabela `followed_match` com o último estado visto (status e placar). Um jogo entra na janela de consulta 2 min antes do início e sai 4 h depois (6 h se ainda estiver em andamento). Cada consulta é **um pedido por campeonato**: o placar do dia da ESPN em que o jogo começa (a ESPN agrupa os dias no horário de Nova York; um jogo às 00:30 UTC de 03/12 está no dia 02/12). Ele já traz os gols com autor e minuto. Se o jogo não estiver nesse dia, os dias vizinhos são consultados. Com gzip, a resposta tem ~1–9 KB conforme o número de jogos do dia.
+- **O que avisar** (`domain/MatchEvents.kt`): início, quando o jogo passa de agendado para em andamento; gol, quando o placar de um time sobe durante o jogo ou logo no apito final. Vários gols entre duas consultas saem em avisos separados, cada um com o placar parcial. Gol anulado (placar que diminui) não avisa. Um jogo inteiro perdido entre duas consultas também não gera avisos atrasados. Ao acompanhar, o estado atual é guardado, então só o que acontecer dali em diante vira aviso.
+- **Durante os jogos:** o `LiveMatchService` (serviço em primeiro plano do tipo `dataSync`) consulta a cada 30 s com a bola rolando e a cada 1 min antes do apito inicial e no intervalo (`MatchEvents.pollInterval`), e mostra uma notificação fixa e silenciosa com os placares. Com a opção **Economia de bateria** (Configurações › Notificações), os intervalos passam a 2 min e 3 min. Ele se encerra sozinho quando nenhum jogo acompanhado está na janela. No Android 15+, esse tipo de serviço tem limite de 6 h por dia; ao esgotar, o app segue pelo WorkManager.
+- **Para acordar no início:** um alarme exato 2 min antes do próximo jogo acompanhado. Com a permissão "Alarmes e lembretes", o alarme também autoriza iniciar o serviço com o app em segundo plano. O app explica a permissão uma vez, ao acompanhar o primeiro jogo, e mostra o estado dela nas Configurações.
+- **Sem alarme exato,** ou quando o Android não deixa iniciar o serviço: o `WatchWorker` consulta em laço, no mínimo a cada 1 min, e o sistema pode espaçar isso com o aparelho em repouso.
+- **Trabalho periódico** (rede de segurança e jogos do time do coração), só quando há o que acompanhar: a cada 15 min se algum jogo acompanhado começa nas próximas 6 h; a cada 6 h se há jogos mais distantes ou o aviso do time do coração está ligado; nenhum caso contrário.
+- **Consumo estimado** (não medido em aparelho): ~0,1–1 MB por hora de jogo acompanhado. Fora dos jogos, só o trabalho periódico. Na bateria, o maior custo é acordar o rádio a cada consulta, principalmente em 4G/5G.
+- Alarmes são reagendados ao reiniciar o aparelho, ao atualizar o app e quando a permissão de alarmes muda.
+- **Teste:** o build de debug tem um comando adb que "rebobina" um jogo real encerrado para testar os avisos (`app/src/debug/.../DebugCommandReceiver.kt`).
+
 ## 6. Arquitetura
 
 - Módulo único `:app`, pacote `io.github.alcindogandhi.champs`.
 - Injeção de dependências manual (`AppContainer` em `ChampsApp`).
 - ViewModels com `StateFlow`. O `Loader` (`ui/common/DataState.kt`) liga um fluxo do repositório ao estado da tela (dado, carregando, atualizando, erro) e cancela a carga anterior a cada nova.
 - Rede: OkHttp e kotlinx.serialization com campos opcionais e `ignoreUnknownKeys`, para tolerar mudanças na API. Escudos carregados pelo Coil, com cache em disco.
-- Persistência: Room para as simulações (`simulation`, `simulated_score`) e DataStore para as preferências.
+- Persistência: Room para as simulações (`simulation`, `simulated_score`) e os jogos acompanhados (`followed_match`), e DataStore para as preferências.
+- Notificações: serviço em primeiro plano, `AlarmManager` e WorkManager (§5.7).
 - Navegação: Navigation Compose com rotas tipadas (`ui/AppRoot.kt`).
 
 ## 7. Privacidade

@@ -20,6 +20,19 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.outlined.NotificationAdd
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import io.github.alcindogandhi.champs.ui.common.exactAlarmSettingsIntent
+import io.github.alcindogandhi.champs.ui.common.rememberNotificationPermissionRequest
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.SportsSoccer
@@ -83,6 +96,25 @@ import kotlinx.coroutines.launch
 fun MatchScreen(container: AppContainer, slug: String, eventId: String, navigator: Navigator) {
     val vm = viewModel(key = "match-$slug-$eventId") { MatchViewModel(container, slug, eventId) }
     val state by vm.detail.state.collectAsStateWithLifecycle()
+    val following by vm.following.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var explainingExactAlarm by rememberSaveable { mutableStateOf(false) }
+    val followedMessage = stringResource(R.string.follow_match_done)
+    val blockedMessage = stringResource(R.string.notifications_blocked)
+    val match = state.data?.match
+    val canFollow = match != null && (match.status.state == MatchState.SCHEDULED || match.isLive)
+    val requestPermission = rememberNotificationPermissionRequest { granted ->
+        val current = match ?: return@rememberNotificationPermissionRequest
+        if (!granted) {
+            scope.launch { snackbar.showSnackbar(blockedMessage) }
+            return@rememberNotificationPermissionRequest
+        }
+        vm.follow(current) { explain ->
+            if (explain) explainingExactAlarm = true else scope.launch { snackbar.showSnackbar(followedMessage) }
+        }
+    }
     val live = state.data?.match?.needsLiveRefresh() == true
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -106,12 +138,26 @@ fun MatchScreen(container: AppContainer, slug: String, eventId: String, navigato
                     }
                 },
                 actions = {
+                    if (following || canFollow) {
+                        IconButton(onClick = { if (following) vm.unfollow() else requestPermission() }) {
+                            if (following) {
+                                Icon(
+                                    Icons.Filled.NotificationsActive,
+                                    contentDescription = stringResource(R.string.unfollow_match),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            } else {
+                                Icon(Icons.Outlined.NotificationAdd, contentDescription = stringResource(R.string.follow_match))
+                            }
+                        }
+                    }
                     IconButton(onClick = { vm.refresh() }) {
                         Icon(Icons.Outlined.Refresh, contentDescription = stringResource(R.string.refresh))
                     }
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         DataContent(
             state = state,
@@ -125,6 +171,30 @@ fun MatchScreen(container: AppContainer, slug: String, eventId: String, navigato
             }
         }
     }
+
+    if (explainingExactAlarm) {
+        ExactAlarmDialog(
+            onAllow = {
+                explainingExactAlarm = false
+                runCatching { context.startActivity(exactAlarmSettingsIntent(context)) }
+            },
+            onDismiss = {
+                explainingExactAlarm = false
+                scope.launch { snackbar.showSnackbar(followedMessage) }
+            },
+        )
+    }
+}
+
+@Composable
+private fun ExactAlarmDialog(onAllow: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.exact_alarm_dialog_title)) },
+        text = { Text(stringResource(R.string.exact_alarm_dialog_text)) },
+        confirmButton = { TextButton(onClick = onAllow) { Text(stringResource(R.string.allow)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.not_now)) } },
+    )
 }
 
 @Composable

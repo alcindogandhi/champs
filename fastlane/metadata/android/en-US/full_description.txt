@@ -22,6 +22,9 @@ MATCHES
 FAVORITE TEAM
 Mark your team to see it highlighted in tables and get a shortcut to its upcoming matches and results.
 
+GOAL ALERTS
+Tap the bell on a match to be alerted at kick-off and for every goal, with score, minute and scorer. Your favorite team's matches are added automatically. No server or Firebase involved: your phone follows the matches itself.
+
 SIMULATOR
 Fill in the scores of the remaining matches and watch the final table change instantly, with how many places each team gained or lost. Save several simulations and share yours.
 

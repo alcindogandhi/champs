@@ -2,6 +2,7 @@ package io.github.alcindogandhi.champs.data.settings
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.alcindogandhi.champs.catalog.CompetitionCatalog
@@ -22,6 +23,12 @@ data class Settings(
     val followed: List<String> = CompetitionCatalog.defaultFollowed,
     val favorite: FavoriteTeam? = null,
     val columns: Set<TableColumn> = DEFAULT_COLUMNS,
+    /** Avisar início e gols dos jogos do time do coração. */
+    val notifyFavorite: Boolean = true,
+    /** Já explicou ao usuário a permissão de alarmes exatos (mostrada uma vez). */
+    val exactAlarmExplained: Boolean = false,
+    /** Consultas mais espaçadas durante os jogos acompanhados (2 min em vez de 30 s). */
+    val batterySaver: Boolean = false,
 ) {
     companion object {
         val DEFAULT_COLUMNS = setOf(
@@ -41,6 +48,9 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             columns = prefs[COLUMNS]?.split(',')?.mapNotNull { name ->
                 runCatching { TableColumn.valueOf(name) }.getOrNull()
             }?.toSet() ?: Settings.DEFAULT_COLUMNS,
+            notifyFavorite = prefs[NOTIFY_FAVORITE] ?: true,
+            exactAlarmExplained = prefs[EXACT_ALARM_EXPLAINED] ?: false,
+            batterySaver = prefs[BATTERY_SAVER] ?: false,
         )
     }.distinctUntilChanged()
 
@@ -76,6 +86,18 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         store.edit { prefs -> prefs[COLUMNS] = TableColumn.entries.filter { it in columns }.joinToString(",") { it.name } }
     }
 
+    suspend fun setNotifyFavorite(enabled: Boolean) {
+        store.edit { it[NOTIFY_FAVORITE] = enabled }
+    }
+
+    suspend fun setBatterySaver(enabled: Boolean) {
+        store.edit { it[BATTERY_SAVER] = enabled }
+    }
+
+    suspend fun setExactAlarmExplained() {
+        store.edit { it[EXACT_ALARM_EXPLAINED] = true }
+    }
+
     suspend fun clear() {
         store.edit { it.clear() }
     }
@@ -88,5 +110,8 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         val FAV_ID = stringPreferencesKey("favorite_id")
         val FAV_NAME = stringPreferencesKey("favorite_name")
         val FAV_LOGO = stringPreferencesKey("favorite_logo")
+        val NOTIFY_FAVORITE = booleanPreferencesKey("notify_favorite")
+        val EXACT_ALARM_EXPLAINED = booleanPreferencesKey("exact_alarm_explained")
+        val BATTERY_SAVER = booleanPreferencesKey("battery_saver")
     }
 }

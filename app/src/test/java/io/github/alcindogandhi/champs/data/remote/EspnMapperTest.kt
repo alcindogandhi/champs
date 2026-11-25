@@ -130,6 +130,15 @@ class EspnMapperTest {
     }
 
     @Test
+    fun `intervalo do jogo vem marcado`() {
+        val halftime = EspnMapper.status(StatusDto(displayClock = "45'", type = StatusTypeDto(name = "STATUS_HALFTIME", state = "in")))
+        assertEquals(MatchState.LIVE, halftime.state)
+        assertTrue(halftime.halftime)
+        val rolling = EspnMapper.status(StatusDto(displayClock = "67'", type = StatusTypeDto(name = "STATUS_SECOND_HALF", state = "in")))
+        assertEquals(false, rolling.halftime)
+    }
+
+    @Test
     fun `datas da ESPN em varios formatos`() {
         assertEquals(Instant.parse("2026-11-22T19:00:00Z"), EspnMapper.parseInstant("2026-11-22T19:00Z"))
         assertEquals(Instant.parse("2026-01-01T05:05:00Z"), EspnMapper.parseInstant("2026-01-01T05:05:00.000+00:00"))

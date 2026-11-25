@@ -213,4 +213,39 @@
     <string name="license_description">GNU GPL 3.0: software livre, sem anúncios</string>
     <string name="privacy">Política de privacidade</string>
     <string name="privacy_description">Nenhum dado pessoal é coletado</string>
+
+    <!-- Notificações -->
+    <string name="notifications">Notificações</string>
+    <string name="channel_events_name">Gols e início dos jogos</string>
+    <string name="channel_events_description">Avisos dos jogos que você acompanha</string>
+    <string name="channel_watching_name">Acompanhamento de jogos</string>
+    <string name="channel_watching_description">Notificação fixa enquanto o app acompanha jogos em andamento</string>
+    <string name="notification_match_start">Começa o jogo!</string>
+    <string name="notification_goal">Gol do %1$s!</string>
+    <string name="notification_own_goal">contra</string>
+    <string name="notification_penalty">pênalti</string>
+    <plurals name="notification_watching">
+        <item quantity="one">Acompanhando %d jogo</item>
+        <item quantity="many">Acompanhando %d jogos</item>
+        <item quantity="other">Acompanhando %d jogos</item>
+    </plurals>
+    <string name="follow_match">Avisar início e gols</string>
+    <string name="unfollow_match">Parar de acompanhar</string>
+    <string name="follow_match_done">Você será avisado do início e dos gols deste jogo</string>
+    <string name="notifications_blocked">Notificações bloqueadas. Permita nas configurações do app.</string>
+    <string name="exact_alarm_dialog_title">Avisos na hora certa</string>
+    <string name="exact_alarm_dialog_text">Para começar a acompanhar o jogo no horário, mesmo com o celular em repouso, permita Alarmes e lembretes para o Champs. Sem isso, os avisos podem atrasar.</string>
+    <string name="allow">Permitir</string>
+    <string name="not_now">Agora não</string>
+    <string name="notify_favorite_team">Avisar jogos do meu time</string>
+    <string name="notify_favorite_team_description">Início e gols dos jogos do %1$s</string>
+    <string name="notify_favorite_team_none">Escolha um time do coração para receber os avisos dos jogos dele</string>
+    <string name="battery_saver">Economia de bateria</string>
+    <string name="battery_saver_description">Durante os jogos acompanhados, consulta a cada 2 min em vez de 30 s. Os avisos podem chegar até 2 min depois.</string>
+    <string name="notifications_permission">Permissão de notificações</string>
+    <string name="allowed">Permitida</string>
+    <string name="notifications_blocked_tap">Bloqueada. Toque para permitir.</string>
+    <string name="exact_alarms">Alarmes e lembretes</string>
+    <string name="exact_alarms_allowed">Permitido: avisos na hora certa</string>
+    <string name="exact_alarms_denied">Não permitido: com o celular em repouso, os avisos podem atrasar. Toque para permitir.</string>
 </resources>

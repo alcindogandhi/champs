@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.json.Json
+import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
@@ -56,15 +57,25 @@ interface FootballDataSource {
     fun standings(slug: String, force: Boolean = false): Flow<Loaded<List<StandingGroup>>>
     fun scorers(slug: String, force: Boolean = false): Flow<Loaded<List<Scorer>>>
     fun matchesOn(slug: String, date: LocalDate, force: Boolean = false): Flow<Loaded<List<Match>>>
+
+    /**
+     * Jogos do "dia da ESPN" em que [instant] cai: um único pedido, sem filtrar pelo fuso do aparelho.
+     * [dayOffset] pega um dia vizinho (-1, +1). Usado para vigiar jogos acompanhados com o mínimo de dados.
+     */
+    fun matchesOfEspnDay(slug: String, instant: Instant, dayOffset: Long = 0, force: Boolean = false): Flow<Loaded<List<Match>>>
     fun matchDetail(slug: String, eventId: String, force: Boolean = false): Flow<Loaded<MatchDetail>>
     fun teams(slug: String, force: Boolean = false): Flow<Loaded<List<Team>>>
     fun teamSchedule(slug: String, teamId: String, force: Boolean = false): Flow<Loaded<TeamSchedule>>
+
+    /** Só os próximos jogos do time (resposta pequena), para acompanhar os jogos do time do coração. */
+    fun teamFixtures(slug: String, teamId: String, force: Boolean = false): Flow<Loaded<List<Match>>>
     suspend fun clearCache()
 }
 
 class EspnDataSource(
     private val client: EspnClient,
     private val zone: () -> ZoneId = ZoneId::systemDefault,
+    private val now: () -> Instant = Instant::now,
 ) : FootballDataSource {
 
     private val json = Json {
@@ -131,10 +142,20 @@ class EspnDataSource(
         }
     }
 
+    override fun matchesOfEspnDay(slug: String, instant: Instant, dayOffset: Long, force: Boolean) = resource(
+        url = dayUrl(slug, instant.atZone(ESPN_ZONE).toLocalDate().plusDays(dayOffset)),
+        force = force,
+        parse = { EspnMapper.matches(json.decodeFromString<ScoreboardDto>(it), slug) },
+        maxAge = { THIRTY_SECONDS },
+    )
+
     override fun season(slug: String, force: Boolean): Flow<Loaded<Season>> = seasonFlow(slug, force, emptyMap())
 
     override fun seasonLive(slug: String): Flow<Loaded<Season>> = flow {
-        val fetched = espnDays(LocalDate.now(zone())).map { client.fetch(dayUrl(slug, it)) }
+        // Jogos ao vivo agora estão no dia de hoje da ESPN; de madrugada em Nova York, também no de ontem.
+        val espnNow = now().atZone(ESPN_ZONE)
+        val days = listOfNotNull(espnNow.toLocalDate(), espnNow.toLocalDate().minusDays(1).takeIf { espnNow.hour < 6 })
+        val fetched = days.map { client.fetch(dayUrl(slug, it)) }
         val today = fetched.flatMap { EspnMapper.matches(json.decodeFromString<ScoreboardDto>(it.text), slug) }
             .associateBy { it.id }
         seasonFlow(slug, force = false, overrides = today).collect { emit(it) }
@@ -251,6 +272,15 @@ class EspnDataSource(
         )
     }
 
+    override fun teamFixtures(slug: String, teamId: String, force: Boolean) = resource(
+        url = "$SITE/$slug/teams/$teamId/schedule?fixture=true&${localeQuery()}",
+        force = force,
+        parse = { text ->
+            EspnMapper.schedule(json.decodeFromString<ScheduleDto>(text), slug).filterNot { it.isFinished }.sortedBy { it.date }
+        },
+        maxAge = { THREE_HOURS },
+    )
+
     override suspend fun clearCache() = client.clear().let { }
 
     private companion object {
@@ -264,6 +294,7 @@ class EspnDataSource(
         const val TEN_MINUTES = 10 * ONE_MINUTE
         const val FIFTEEN_MINUTES = 15 * ONE_MINUTE
         const val ONE_HOUR = 60 * ONE_MINUTE
+        const val THREE_HOURS = 3 * ONE_HOUR
         const val SIX_HOURS = 6 * ONE_HOUR
         const val ONE_DAY = 24 * ONE_HOUR
         const val ONE_WEEK = 7 * ONE_DAY

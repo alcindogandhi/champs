@@ -25,6 +25,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -56,6 +57,7 @@ import io.github.alcindogandhi.champs.ui.team.FavoriteTeamPickerScreen
 import io.github.alcindogandhi.champs.ui.team.TeamScreen
 import io.github.alcindogandhi.champs.ui.theme.ChampsTheme
 import io.github.alcindogandhi.champs.ui.today.TodayScreen
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -119,7 +121,7 @@ class Navigator(private val nav: NavHostController, val openDrawer: () -> Unit) 
 }
 
 @Composable
-fun AppRoot(container: AppContainer) {
+fun AppRoot(container: AppContainer, pendingMatch: MutableStateFlow<MatchRoute?>) {
     val settings by container.settings.settings.collectAsStateWithLifecycle(initialValue = null)
     val current = settings ?: return
     ChampsTheme(current.theme) {
@@ -127,6 +129,14 @@ fun AppRoot(container: AppContainer) {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         val navigator = Navigator(nav) { scope.launch { drawerState.open() } }
+        // Toque numa notificação de jogo: abre o jogo por cima da tela atual.
+        val openMatch by pendingMatch.collectAsStateWithLifecycle()
+        LaunchedEffect(openMatch) {
+            openMatch?.let { route ->
+                nav.navigate(route) { launchSingleTop = true }
+                pendingMatch.value = null
+            }
+        }
         val entry by nav.currentBackStackEntryAsState()
         val destination = entry?.destination
         val topLevel = destination?.hasRoute<TodayRoute>() == true || destination?.hasRoute<CompetitionRoute>() == true
