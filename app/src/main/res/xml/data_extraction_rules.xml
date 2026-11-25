@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Backup inclui preferências e simulações; o cache de respostas da ESPN é descartável. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="espn" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="espn" />
+    </device-transfer>
+</data-extraction-rules>

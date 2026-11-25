@@ -1,0 +1,110 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "7e27bc543a0539cfc20107ccae10a415",
+    "entities": [
+      {
+        "tableName": "simulation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `competitionSlug` TEXT NOT NULL, `name` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "competitionSlug",
+            "columnName": "competitionSlug",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_simulation_competitionSlug",
+            "unique": false,
+            "columnNames": [
+              "competitionSlug"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_simulation_competitionSlug` ON `${TABLE_NAME}` (`competitionSlug`)"
+          }
+        ]
+      },
+      {
+        "tableName": "simulated_score",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simulationId` INTEGER NOT NULL, `matchId` TEXT NOT NULL, `homeGoals` INTEGER NOT NULL, `awayGoals` INTEGER NOT NULL, PRIMARY KEY(`simulationId`, `matchId`), FOREIGN KEY(`simulationId`) REFERENCES `simulation`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "simulationId",
+            "columnName": "simulationId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "matchId",
+            "columnName": "matchId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "homeGoals",
+            "columnName": "homeGoals",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "awayGoals",
+            "columnName": "awayGoals",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "simulationId",
+            "matchId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "simulation",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "simulationId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e27bc543a0539cfc20107ccae10a415')"
+    ]
+  }
+}

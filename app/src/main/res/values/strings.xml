@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Champs</string>
+
+    <!-- Geral -->
+    <string name="back">Voltar</string>
+    <string name="refresh">Atualizar</string>
+    <string name="retry">Tentar de novo</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="erase">Apagar</string>
+    <string name="share">Compartilhar</string>
+    <string name="more_options">Mais opções</string>
+    <string name="none">Nenhum</string>
+    <string name="drawer_open">Abrir menu</string>
+    <string name="no_internet_connection">Sem conexão com a internet</string>
+    <string name="error_http">Não foi possível carregar os dados (erro %1$d)</string>
+    <string name="error_generic">Não foi possível carregar os dados</string>
+    <string name="showing_data_from">%1$s. Mostrando dados de %2$s.</string>
+    <string name="source_espn">Fonte: ESPN</string>
+
+    <!-- Menu lateral -->
+    <string name="matches_today">Jogos de hoje</string>
+    <string name="competitions">Campeonatos</string>
+    <string name="manage_competitions">Gerenciar campeonatos</string>
+    <string name="settings">Configurações</string>
+    <string name="choose_favorite_team">Escolher time do coração</string>
+    <string name="favorite_team_short">Meu time</string>
+
+    <!-- Jogos de hoje -->
+    <string name="today">Hoje</string>
+    <string name="yesterday">Ontem</string>
+    <string name="tomorrow">Amanhã</string>
+    <string name="previous_day">Dia anterior</string>
+    <string name="next_day">Próximo dia</string>
+    <string name="only_live_matches">Só ao vivo</string>
+    <string name="empty_matches">Nenhum jogo encontrado</string>
+    <string name="empty_live_matches">Nenhum jogo ao vivo agora</string>
+    <string name="select_championship_empty">Você não segue nenhum campeonato. Escolha os campeonatos que quer acompanhar.</string>
+
+    <!-- Status do jogo -->
+    <string name="live">Ao vivo</string>
+    <string name="match_finished">Encerrado</string>
+    <string name="match_postponed">Adiado</string>
+    <string name="match_canceled">Cancelado</string>
+
+    <!-- Campeonato -->
+    <string name="standings">Tabela</string>
+    <string name="matches">Jogos</string>
+    <string name="scorers">Artilheiros</string>
+    <string name="empty_classification">Classificação não encontrada. Em copas de mata-mata, veja os confrontos na aba Jogos.</string>
+    <string name="no_scorers">Não foram encontradas informações sobre os artilheiros deste campeonato</string>
+    <string name="choose_columns">Escolher colunas</string>
+    <string name="select_info_to_show">Colunas da tabela</string>
+    <string name="round_number">Rodada %1$d</string>
+    <string name="previous_round">Rodada anterior</string>
+    <string name="next_round">Próxima rodada</string>
+    <string name="advanced">Classificado</string>
+    <string name="player">Jogador</string>
+    <string name="team">Time</string>
+    <string name="standing_row_description">%1$dº lugar, %2$s, %3$d pontos</string>
+    <string name="zones_approximate">Faixas aproximadas: o número de vagas pode mudar a cada temporada.</string>
+
+    <!-- Cabeçalhos da tabela -->
+    <string name="header_position">#</string>
+    <string name="header_points">P</string>
+    <string name="header_played">J</string>
+    <string name="header_wins">V</string>
+    <string name="header_draws">E</string>
+    <string name="header_losses">D</string>
+    <string name="header_goals_for">GP</string>
+    <string name="header_goals_against">GC</string>
+    <string name="header_goal_difference">SG</string>
+    <string name="header_percentage">%</string>
+    <string name="header_variation">±</string>
+    <string name="header_goals">G</string>
+    <string name="played">Jogos</string>
+    <string name="wins">Vitórias</string>
+    <string name="draws">Empates</string>
+    <string name="losses">Derrotas</string>
+    <string name="goals_for">Gols pró</string>
+    <string name="goals_against">Gols contra</string>
+    <string name="goal_difference">Saldo de gols</string>
+    <string name="percentage">Aproveitamento (%)</string>
+
+    <!-- Zonas -->
+    <string name="zone_continental">Classificação direta para torneio continental</string>
+    <string name="zone_continental_qualifying">Fase preliminar do torneio continental</string>
+    <string name="zone_secondary_continental">Segundo torneio continental</string>
+    <string name="zone_promotion">Acesso</string>
+    <string name="zone_playoff">Repescagem</string>
+    <string name="zone_relegation">Rebaixamento</string>
+
+    <!-- Fases -->
+    <string name="phase_regular_season">Fase de classificação</string>
+    <string name="phase_group_stage">Fase de grupos</string>
+    <string name="phase_league_phase">Fase de liga</string>
+    <string name="phase_first_stage">1ª fase</string>
+    <string name="phase_second_stage">2ª fase</string>
+    <string name="phase_third_stage">3ª fase</string>
+    <string name="phase_first_round">1ª fase</string>
+    <string name="phase_second_round">2ª fase</string>
+    <string name="phase_third_round">3ª fase</string>
+    <string name="phase_fourth_round">4ª fase</string>
+    <string name="phase_fifth_round">5ª fase</string>
+    <string name="phase_round_of_32">16 avos de final</string>
+    <string name="phase_round_of_16">Oitavas de final</string>
+    <string name="phase_quarterfinals">Quartas de final</string>
+    <string name="phase_semifinals">Semifinais</string>
+    <string name="phase_final">Final</string>
+    <string name="phase_knockout_playoffs">Playoffs</string>
+    <string name="phase_playoffs">Mata-mata</string>
+    <string name="phase_relegation">Rebaixamento</string>
+    <string name="phase_taca_guanabara">Taça Guanabara</string>
+    <string name="phase_taca_rio">Taça Rio</string>
+    <string name="phase_trofeu_inconfidencia">Troféu Inconfidência</string>
+    <string name="phase_farroupilha">Taça Farroupilha</string>
+    <string name="phase_apertura">Apertura</string>
+    <string name="phase_clausura">Clausura</string>
+
+    <!-- Detalhe do jogo -->
+    <string name="tab_plays">Lances</string>
+    <string name="tab_lineups">Escalação</string>
+    <string name="tab_stats">Comparar</string>
+    <string name="empty_lances">Não há nenhum lance disponível</string>
+    <string name="match_not_started">Parece que o jogo ainda não começou. Os lances aparecem aqui quando a bola rolar.</string>
+    <string name="empty_escalacao">Escalação não disponível</string>
+    <string name="empty_stats">Estatísticas não disponíveis</string>
+    <string name="lineup_field">Campo</string>
+    <string name="lineup_list">Lista</string>
+    <string name="substitutes">Reservas</string>
+    <string name="substitutes_of">Reservas · %1$s</string>
+    <string name="subbed_in">Entrou</string>
+    <string name="subbed_out">Saiu</string>
+    <string name="event_goal">Gol</string>
+    <string name="event_own_goal">Gol contra</string>
+    <string name="event_penalty_missed">Pênalti perdido</string>
+    <string name="event_yellow_card">Cartão amarelo</string>
+    <string name="event_red_card">Cartão vermelho</string>
+    <string name="event_substitution">Substituição</string>
+    <string name="event_var">VAR</string>
+    <string name="stat_possession">Posse de bola</string>
+    <string name="stat_shots">Finalizações</string>
+    <string name="stat_shots_on_target">Finalizações no gol</string>
+    <string name="stat_corners">Escanteios</string>
+    <string name="stat_saves">Defesas</string>
+    <string name="stat_accurate_passes">Passes certos</string>
+    <string name="stat_passes">Passes</string>
+    <string name="stat_fouls">Faltas</string>
+    <string name="stat_offsides">Impedimentos</string>
+    <string name="stat_yellow_cards">Cartões amarelos</string>
+    <string name="stat_red_cards">Cartões vermelhos</string>
+    <string name="stat_other">Outros</string>
+
+    <!-- Time -->
+    <string name="choose_current_team">Time do coração</string>
+    <string name="unchoose_current_team">Remover time do coração</string>
+    <string name="search_team">Buscar time</string>
+    <string name="empty_teams">Sem times disponíveis. Siga campeonatos para ver a lista de times.</string>
+    <string name="next_matches">Próximos jogos</string>
+    <string name="results">Resultados</string>
+    <string name="team_position">%1$dº lugar</string>
+    <plurals name="team_points_games">
+        <item quantity="one">%1$d pontos em %2$d jogo</item>
+        <item quantity="many">%1$d pontos em %2$d jogos</item>
+        <item quantity="other">%1$d pontos em %2$d jogos</item>
+    </plurals>
+    <string name="team_record">%1$dV %2$dE %3$dD</string>
+
+    <!-- Simulador -->
+    <string name="simulator">Simulador</string>
+    <string name="simulator_of">Simulador · %1$s</string>
+    <string name="simulator_info">Simule os resultados dos jogos que ainda não aconteceram e veja a classificação atualizada na hora. Os jogos já encerrados usam o placar real. Por enquanto só é possível simular campeonatos de pontos corridos.</string>
+    <string name="new_simulation">Nova simulação</string>
+    <string name="simulation_default_name">Simulação %1$d</string>
+    <string name="empty_simulations">Sem simulações. Toque em Nova simulação para começar.</string>
+    <string name="created_at">Criada em %1$s</string>
+    <string name="simulation_needs_data">Não foi possível encontrar os jogos deste campeonato. Atualize os dados antes de simular.</string>
+    <string name="real_result">Resultado real</string>
+    <string name="clear_score">Limpar placar</string>
+    <string name="clear_simulation">Limpar todos os placares</string>
+    <string name="edit_name">Editar nome</string>
+    <string name="delete_simulation">Apagar simulação</string>
+    <string name="delete_simulation_confirmation">Você tem certeza que deseja apagar esta simulação?</string>
+    <string name="increase_goals">Mais um gol</string>
+    <string name="decrease_goals">Menos um gol</string>
+    <string name="share_simulation_header">Veja a simulação que eu fiz:</string>
+    <string name="share_simulation_footer">Faça a sua também com o app Champs: %1$s</string>
+
+    <!-- Regiões -->
+    <string name="region_brazil">Brasil</string>
+    <string name="region_south_america">América do Sul</string>
+    <string name="region_europe">Europa</string>
+    <string name="region_world">Mundo</string>
+
+    <!-- Configurações -->
+    <string name="general">Geral</string>
+    <string name="choose_theme">Tema</string>
+    <string name="theme_system">Padrão do sistema</string>
+    <string name="theme_light">Dia</string>
+    <string name="theme_dark">Noite</string>
+    <string name="data">Dados</string>
+    <string name="data_source">Fonte dos dados</string>
+    <string name="data_source_description">ESPN (API pública, não oficial). O Champs não tem vínculo com a ESPN.</string>
+    <string name="clear_data">Apagar todos os dados</string>
+    <string name="clear_data_description">Cache, simulações e preferências</string>
+    <string name="are_you_sure_clear_data">Você tem certeza que deseja apagar todos os dados do aplicativo? Simulações e preferências serão perdidas.</string>
+    <string name="clear_data_done">Dados apagados</string>
+    <string name="about">Sobre</string>
+    <string name="version">Versão</string>
+    <string name="source_code">Código-fonte</string>
+    <string name="license">Licença</string>
+    <string name="license_description">GNU GPL 3.0: software livre, sem anúncios</string>
+    <string name="privacy">Política de privacidade</string>
+    <string name="privacy_description">Nenhum dado pessoal é coletado</string>
+</resources>

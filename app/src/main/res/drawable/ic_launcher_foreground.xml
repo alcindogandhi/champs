@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Troféu estilizado, desenhado dentro da zona segura (66 dp centrais) do ícone adaptativo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Alças -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M39,36 H32 V40 C32,46 35.5,49.5 40.5,50.5 M69,36 H76 V40 C76,46 72.5,49.5 67.5,50.5"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!-- Taça -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,32 H71 V45 C71,55 63.4,62 54,62 C44.6,62 37,55 37,45 Z" />
+    <!-- Haste e base -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50.5,61 H57.5 V69 H50.5 Z M42,69 H66 C67.1,69 68,69.9 68,71 V76 H40 V71 C40,69.9 40.9,69 42,69 Z" />
+    <!-- Estrela na taça -->
+    <path
+        android:fillColor="#1B7F3B"
+        android:pathData="M54,38 L56.2,42.6 L61.2,43.2 L57.5,46.6 L58.5,51.6 L54,49.1 L49.5,51.6 L50.5,46.6 L46.8,43.2 L51.8,42.6 Z" />
+</vector>

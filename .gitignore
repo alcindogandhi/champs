@@ -1,0 +1,20 @@
+*.iml
+.gradle/
+.kotlin/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/app/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+.ignore/
+
+# Assinatura (nunca versionar)
+/keystore.properties
+*.jks
+*.keystore
+
+# APK do Kamps usado só como referência (não é nosso para distribuir)
+/*.apk

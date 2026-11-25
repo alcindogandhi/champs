@@ -1,0 +1,38 @@
+Acompanhe os campeonatos de futebol, principalmente os do Brasil, num app simples, rápido e sem propaganda.
+
+CAMPEONATOS
+• Brasileirão Séries A e B, Copa do Brasil, Copa do Nordeste e os estaduais Paulista, Carioca, Mineiro e Gaúcho.
+• Libertadores, Sul-Americana e Campeonato Argentino.
+• Champions League, Europa League, Conference League, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Liga Portugal e Eredivisie.
+• Copa do Mundo e MLS.
+Escolha quais acompanhar e eles aparecem no menu.
+
+PARA CADA CAMPEONATO
+• Tabela com pontos, jogos, vitórias, empates, derrotas, gols e aproveitamento. Você escolhe as colunas, e as faixas de classificação e rebaixamento aparecem coloridas.
+• Jogos rodada a rodada, abrindo na rodada atual.
+• Mata-mata com ida e volta, agregado, pênaltis e quem se classificou.
+• Artilheiros.
+
+JOGOS
+• Jogos de hoje de todos os campeonatos que você segue, com filtro de jogos ao vivo.
+• Lance a lance, atualizado sozinho durante o jogo.
+• Escalações no campinho ou em lista, com reservas e substituições.
+• Comparação de posse de bola, finalizações, escanteios, passes, faltas e cartões.
+
+TIME DO CORAÇÃO
+Marque seu time para vê-lo em destaque nas tabelas e ter atalho para os próximos jogos e resultados.
+
+SIMULADOR
+Dê os placares dos jogos que faltam e veja a classificação final mudar na hora, com quantas posições cada time ganhou ou perdeu. Salve várias simulações e compartilhe a sua.
+
+FUNCIONA SEM INTERNET
+Os últimos dados ficam guardados no aparelho e a tela abre na hora, mesmo sem conexão.
+
+PRIVACIDADE
+• Sem anúncios, sem conta e sem rastreamento.
+• Nenhum dado pessoal é coletado.
+
+CÓDIGO ABERTO
+Software livre sob a licença GPL-3.0. Código, sugestões e relatos de problemas em github.com/alcindogandhi/champs
+
+Dados: API pública da ESPN. O Champs não tem vínculo com a ESPN. Requer Android 10 ou mais recente.

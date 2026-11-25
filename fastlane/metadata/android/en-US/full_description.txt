@@ -1,0 +1,38 @@
+Follow football (soccer) competitions, especially Brazilian ones, in a simple, fast, ad-free app.
+
+COMPETITIONS
+• Brazilian Série A and B, Copa do Brasil, Copa do Nordeste and the Paulista, Carioca, Mineiro and Gaúcho state championships.
+• Copa Libertadores, Copa Sudamericana and the Argentine league.
+• Champions League, Europa League, Conference League, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Liga Portugal and Eredivisie.
+• FIFA World Cup and MLS.
+Choose which ones to follow and they show up in the menu.
+
+FOR EACH COMPETITION
+• Table with points, matches, wins, draws, losses, goals and points won. You choose the columns, and qualification and relegation zones are color-coded.
+• Matches round by round, opening on the current round.
+• Knockout ties with both legs, aggregate, penalties and who advanced.
+• Top scorers.
+
+MATCHES
+• Today's matches from every competition you follow, with a live-only filter.
+• Play by play, refreshed automatically during the match.
+• Lineups on the pitch or as a list, with substitutes and substitutions.
+• Comparison of possession, shots, corners, passes, fouls and cards.
+
+FAVORITE TEAM
+Mark your team to see it highlighted in tables and get a shortcut to its upcoming matches and results.
+
+SIMULATOR
+Fill in the scores of the remaining matches and watch the final table change instantly, with how many places each team gained or lost. Save several simulations and share yours.
+
+WORKS OFFLINE
+The latest data is kept on the device and screens open instantly, even without a connection.
+
+PRIVACY
+• No ads, no account, no tracking.
+• No personal data is collected.
+
+OPEN SOURCE
+Free software under the GPL-3.0 license. Code, suggestions and bug reports at github.com/alcindogandhi/champs
+
+Data: ESPN public API. Champs is not affiliated with ESPN. Requires Android 10 or newer.
